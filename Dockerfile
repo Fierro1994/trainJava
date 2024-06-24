@@ -3,7 +3,7 @@ FROM openjdk:21-slim
 
 WORKDIR /app
 
-COPY target/train-0.0.1.jar train-app.jar
+COPY train-0.0.1.jar train-app.jar
 
 EXPOSE 8080
 

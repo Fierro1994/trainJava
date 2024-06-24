@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  myapp-mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: train
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  myapp-main:
+      image: train-app
+      ports:
+        - "8080:8080"
+      depends_on:
+        - myapp-mysql
+      environment:
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+        SPRING_DATASOURCE_HOST: "myapp-mysql"
+        SPRING_DATASOURCE_URL: jdbc:mysql://myapp-mysql:3306/train
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: 123456
+volumes:
+  mysql-data:
+

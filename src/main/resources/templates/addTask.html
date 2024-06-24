@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Add Task</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Все задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+<script>
+    function previewTheory() {
+        const theoryInput = document.getElementById("theory").value;
+        const theoryPreview = document.getElementById("theoryPreview");
+        const theoryText = document.getElementById("theoryText");
+
+        if (theoryInput.startsWith("http://") || theoryInput.startsWith("https://")) {
+            theoryPreview.src = theoryInput;
+            theoryPreview.style.display = "block";
+            theoryText.style.display = "none";
+        } else {
+            theoryText.innerText = theoryInput;
+            theoryText.style.display = "block";
+            theoryPreview.style.display = "none";
+        }
+    }
+</script>
+<body>
+<div class="container">
+    <h1>Добавить задачу</h1>
+    <form th:action="@{/tasks/save}" method="post">
+        <div class="form-group">
+            <label for="category">Выбери категорию:</label>
+            <select id="category" th:field="*{task.category}">
+                <option th:each="cat : ${T(com.example.train.entity.CategoryNames).values()}"
+                        th:value="${cat}" th:text="${cat.getDisplayName()}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="question">Вопрос:</label>
+            <input type="text" id="question" name="question" required />
+        </div>
+        <div class="form-group">
+            <label for="answer">Ответ:</label>
+            <textarea id="answer" name="answer" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="theory">Теория:</label>
+            <textarea id="theory" name="theory" oninput="previewTheory()" rows="4" cols="50"></textarea>
+        </div>
+
+        <div class="button-container">
+            <button class="btn" type="submit">Сохранить</button>
+        </div>
+
+        <div th:if="${#strings.isEmpty(errorMessage)} == false" class="error-message">
+            <p th:text="${errorMessage}"></p>
+            <a th:href="@{/tasks/{id}(id=${task.id})}">
+                <span th:text="${task.id}"></span>: <span th:text="${task.question}"></span>
+            </a>
+        </div>
+
+    </form>
+    <h2>Предпросмотр теории</h2>
+    <div>
+        <iframe id="theoryPreview" width="100%" height="500px" style="display:none;" allow-same-origin></iframe>
+        <p id="theoryText" style="display:none;"></p>
+    </div>
+</div>
+</body>
+</html>

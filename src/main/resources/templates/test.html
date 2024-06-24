@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Тест</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Все задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <div th:if="${errorMessage}">
+        <p th:text="${errorMessage}" class="error-message"></p>
+    </div>
+    <form th:action="@{/test/submit}" method="post">
+        <input type="hidden" name="taskId" th:value="${task.id}" />
+        <p class="question-text" th:text="${task.question}"></p>
+        <textarea name="answer" required></textarea>
+        <div class="button-container">
+            <button class="btn" type="submit">Ответить</button>
+        </div>
+    </form>
+    <form th:action="@{/test/finish}" method="get">
+        <div class="button-container">
+            <button class="btn btn-red" type="submit">Завершить тест</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <title>Информация о задаче</title>
+  <link th:href="@{/css/styles.css}" rel="stylesheet" />
+</head>
+<body>
+<header>
+  <nav>
+    <ul>
+      <li><a th:href="@{/profile}">Профиль</a></li>
+      <li><a th:href="@{/}">Все задачи</a></li>
+      <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+      <li><a th:href="@{/test}">Начать тест</a></li>
+      <li><a th:href="@{/logout}">Выйти</a></li>
+    </ul>
+  </nav>
+</header>
+<div class="container">
+  <h1 class="h1_main">Информация о задаче</h1>
+  <div class="info-section">
+    <label class="label_main" for="category">Категория:</label>
+    <p th:text="${task.category.getDisplayName()}" id="category" class="info-text"></p>
+  </div>
+  <div class="info-section">
+    <label class="label_main" for="question">Вопрос:</label>
+    <p th:text="${task.question}" id="question" class="info-text"></p>
+  </div>
+  <div class="info-section">
+    <label class="label_main" for="answer">Ответ:</label>
+    <p th:text="${task.answer}" id="answer" class="info-text"></p>
+  </div>
+  <div class="info-section">
+    <label class="label_main" for="theoryPreview">Теория:</label>
+    <iframe id="theoryPreview" width="100%" height="500px" style="display:none;" allow-same-origin></iframe>
+    <p id="theoryText" class="info-text" style="display:none;"></p>
+  </div>
+  <div class="button-container">
+    <form th:action="@{/tasks/{id}(id=${task.id})}" method="post">
+      <button type="submit" class="btn btn-red">Удалить задачу</button>
+    </form>
+  </div>
+</div>
+<script>
+  var task =  "[[${task.theory}]]";
+  previewTheory();
+
+  function previewTheory() {
+    const theoryInput = task;
+    const theoryPreview = document.getElementById("theoryPreview");
+    const theoryText = document.getElementById("theoryText");
+
+    if (theoryPreview && theoryText) {
+      theoryText.innerText = theoryInput;
+      if (theoryInput.startsWith("http://") || theoryInput.startsWith("https://")) {
+        theoryPreview.src = theoryInput;
+        theoryPreview.style.display = "block";
+        theoryText.style.display = "none";
+      } else {
+        theoryText.innerText = task;
+        theoryText.style.display = "block";
+        theoryPreview.style.display = "none";
+      }
+    }
+  }
+</script>
+</body>
+</html>

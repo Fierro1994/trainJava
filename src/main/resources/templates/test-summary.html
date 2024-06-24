@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Результаты Теста</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Все задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+<body>
+<div class="container">
+    <h1 class="h1_main">Результаты Теста</h1>
+    <p>Всего правильных ответов: <span th:text="${correctCount}"></span> из <span th:text="${totalQuestions}"></span></p>
+    <h2>Более подробно</h2>
+    <ul class="results-list">
+        <li th:each="answerInfo : ${userAnswers}" class="result-item" data-task-id="${answerInfo['taskId']}">
+            <p><strong>Вопрос:</strong> <span th:text="${answerInfo['question']}"></span></p>
+            <p><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 2, 2)} + '%'"></span></p>
+            <div class="answer-container">
+                <div class="answer-block correct-answer">
+                    <p><strong>Правильный ответ:</strong></p>
+                    <p th:text="${answerInfo['correctAnswer']}"></p>
+                </div>
+                <div class="answer-block user-answer">
+                    <p><strong>Твой ответ:</strong></p>
+                    <p th:text="${answerInfo['userAnswer']}"></p>
+                </div>
+            </div>
+            <p><strong>Ссылка на задачу с теорией:</strong> <a th:href="@{/tasks/{id}(id=${answerInfo['taskId']})}" th:text="${answerInfo['question']}"></a></p>
+            <hr/>
+        </li>
+    </ul>
+    <a class="btn" th:href="@{/test}">Начать новый тест</a>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.result-item').forEach(function(item) {
+            const taskId = item.getAttribute('data-task-id');
+            const correctAnswerElem = item.querySelector('.correct-answer p:nth-of-type(2)');
+            const userAnswerElem = item.querySelector('.user-answer p:nth-of-type(2)');
+
+            if (correctAnswerElem && userAnswerElem) {
+                const correctAnswer = correctAnswerElem.innerText;
+                const userAnswer = userAnswerElem.innerText;
+
+                function highlightDifferences(correct, user) {
+                    const correctWords = correct.split(' ');
+                    const userWords = user.split(' ');
+
+                    const maxLen = Math.max(correctWords.length, userWords.length);
+                    let highlightedCorrect = '';
+                    let highlightedUser = '';
+
+                    for (let i = 0; i < maxLen; i++) {
+                        if (correctWords[i] === userWords[i]) {
+                            highlightedCorrect += `<span class="highlight-green">${correctWords[i]}</span> `;
+                            highlightedUser += `<span class="highlight-green">${userWords[i]}</span> `;
+                        } else {
+                            if (correctWords[i]) {
+                                highlightedCorrect += `<span class="highlight-red">${correctWords[i]}</span> `;
+                            }
+                            if (userWords[i]) {
+                                highlightedUser += `<span class="highlight-red">${userWords[i]}</span> `;
+                            }
+                        }
+                    }
+                    return { highlightedCorrect, highlightedUser };
+                }
+
+                const { highlightedCorrect, highlightedUser } = highlightDifferences(correctAnswer, userAnswer);
+
+                correctAnswerElem.innerHTML = highlightedCorrect;
+                userAnswerElem.innerHTML = highlightedUser;
+            }
+        });
+    });
+</script>
+</body>
+</html>

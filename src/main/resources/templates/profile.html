@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Профиль</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Все задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+<body>
+<div class="container">
+    <h1>Профиль</h1>
+    <p>Имя пользователя: <span th:text="${user.username}"></span></p>
+    <h2>Статистика</h2>
+    <p>Количество попыток пройти тест: <span th:text="${user.testAttempts}"></span></p>
+    <p>Количество правильных ответов: <span th:text="${user.correctAnswers}"></span></p>
+    <h3>Темы для повторения</h3>
+    <ul class="results-list">
+        <li th:each="task : ${tasksForReview}">
+            <a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.question}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

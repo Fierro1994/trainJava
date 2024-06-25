@@ -17,9 +17,9 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByUsername("admin") == null) {
+            if (userRepository.findByUsername("fierro1994") == null) {
                 User admin = new User();
-                admin.setUsername("admin");
+                admin.setUsername("fierro1994");
                 admin.setPassword("DD52joexcmk!");
                 authService.register(admin, RoleName.ROLE_ADMIN);
                 System.out.println("Админ создан");

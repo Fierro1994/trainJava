@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/traindb
-    username: root
-    password: DD53joexcmk
+    url: jdbc:mysql://localhost:3306/train
+    username: user
+    password: AstonTrain2024
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:

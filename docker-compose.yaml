@@ -3,7 +3,7 @@ services:
   myapp-mysql:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: AstonTrain2024
       MYSQL_DATABASE: train
     ports:
       - "3307:3306"
@@ -21,7 +21,7 @@ services:
         SPRING_DATASOURCE_HOST: "myapp-mysql"
         SPRING_DATASOURCE_URL: jdbc:mysql://myapp-mysql:3306/train
         SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: 123456
+        SPRING_DATASOURCE_PASSWORD: AstonTrain2024
 volumes:
   mysql-data:
 

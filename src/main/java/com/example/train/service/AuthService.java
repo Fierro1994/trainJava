@@ -1,5 +1,6 @@
 package com.example.train.service;
 
+import com.example.train.entity.RoleName;
 import com.example.train.entity.User;
 import com.example.train.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,11 @@ public class AuthService {
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
-    private  UserRepository userRepository;
-    public void register(User user) {
+    private UserRepository userRepository;
+
+    public void register(User user, RoleName role) {
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole("ROLE_USER");
+        user.setRole(role);
         userRepository.save(user);
     }
 }

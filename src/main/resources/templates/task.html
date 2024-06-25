@@ -9,10 +9,13 @@
 <header>
   <nav>
     <ul>
-      <li><a th:href="@{/profile}">Профиль</a></li>
-      <li><a th:href="@{/}">Все задачи</a></li>
+      <li><a th:href="@{/}">Профиль</a></li>
+      <li><a th:href="@{/tasks/list}">Все задачи</a></li>
       <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
       <li><a th:href="@{/test}">Начать тест</a></li>
+      <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+        <a th:href="@{/admin/users}">Управление пользователями</a>
+      </li>
       <li><a th:href="@{/logout}">Выйти</a></li>
     </ul>
   </nav>

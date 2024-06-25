@@ -22,7 +22,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleName role;
 
     private int testAttempts;
     private int correctAnswers;

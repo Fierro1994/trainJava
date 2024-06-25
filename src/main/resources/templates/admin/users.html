@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Управление пользователями</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a th:href="@{/}">Профиль</a></li>
+            <li><a th:href="@{/tasks/list}">Все задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
+            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:href="@{/admin/users}">Управление пользователями</a>
+            </li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <h1 class="h1_main">Управление пользователями</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Имя пользователя</th>
+            <th>Роль</th>
+            <th>Действие</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.username}">Имя пользователя</td>
+            <td th:text="${user.role}">Роль</td>
+            <td>
+                <form th:action="@{/admin/users/role}" method="post">
+                    <input type="hidden" name="userId" th:value="${user.id}" />
+                    <select name="role">
+                        <option th:each="role : ${T(com.example.train.entity.RoleName).values()}"
+                                th:value="${role}"
+                                th:text="${role}"
+                                th:selected="${role} == ${user.role}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn">Изменить роль</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.example.train.controllers;
 
+import com.example.train.entity.RoleName;
 import com.example.train.entity.User;
 import com.example.train.service.AuthService;
 import com.example.train.service.UserService;
@@ -25,11 +26,11 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
-        if (userService.findByUsername(user.getUsername()) != null) {
+        if (userService.loadUserByUsername(user.getUsername()) != null) {
             model.addAttribute("errorMessage", "Username already exists.");
             return "register";
         }
-        authService.register(user);
+        authService.register(user, RoleName.ROLE_USER); // По умолчанию назначаем роль пользователя
         return "redirect:/login";
     }
 }

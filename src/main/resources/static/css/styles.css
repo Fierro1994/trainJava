@@ -23,9 +23,11 @@ nav ul {
 
 nav ul li {
     margin: 0 15px;
+    width: 11vw;
 }
 
 nav ul li a {
+    font-size: 90%;
     color: #fff;
     text-decoration: none;
     font-weight: bold;
@@ -242,7 +244,44 @@ textarea {
     font-weight: bold;
     margin-bottom: 10px;
 }
+
 .ql-editor img {
     max-width: 100%;
     height: auto;
+}
+
+/* Бургер-меню стили */
+.burger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.burger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 4px;
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        display: none;
+        width: 100%;
+    }
+
+    nav ul.active {
+        display: flex;
+    }
+
+    nav ul li {
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .burger {
+        display: flex;
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.train.service;
 
-import com.example.train.entity.Task;
 import com.example.train.entity.User;
 import com.example.train.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

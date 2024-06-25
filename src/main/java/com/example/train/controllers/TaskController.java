@@ -25,7 +25,11 @@ public class TaskController {
     }
 
     @PostMapping("/tasks/save")
-    public String save(@RequestParam String question, String answer, String theory, CategoryNames category, Model model) throws MalformedURLException, URISyntaxException {
+    public String save(@RequestParam String question,
+                       @RequestParam String answer,
+                       @RequestParam String theory,
+                       @RequestParam CategoryNames category,
+                       Model model) throws MalformedURLException, URISyntaxException {
         return taskService.saveTask(question, answer, theory, category, model);
     }
 
@@ -34,10 +38,10 @@ public class TaskController {
         return taskService.getTask(id, model);
     }
 
-    // Add the deleteTask method here
-    @PostMapping("/tasks/{id}")
+    @PostMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable Long id) {
-        return taskService.deleteTask(id);
+        taskService.deleteTask(id);
+        return "redirect:/";
     }
 
     @GetMapping("/")

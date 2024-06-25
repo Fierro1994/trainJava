@@ -4,14 +4,10 @@ services:
       image: train-app
       ports:
         - "8080:8080"
-      depends_on:
-        - myapp-mysql
       environment:
         SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
         SPRING_DATASOURCE_HOST: "localhost"
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/train
         SPRING_DATASOURCE_USERNAME: user
         SPRING_DATASOURCE_PASSWORD: AstonTrain2024
-volumes:
-  mysql-data:
 

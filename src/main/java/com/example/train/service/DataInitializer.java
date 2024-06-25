@@ -17,7 +17,7 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByUsername("fierro1994") == null) {
+            if (userRepository.findByUsername("fierro1994").isEmpty()) {
                 User admin = new User();
                 admin.setUsername("fierro1994");
                 admin.setPassword("DD52joexcmk!");

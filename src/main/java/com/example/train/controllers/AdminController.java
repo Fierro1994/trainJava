@@ -30,4 +30,9 @@ public class AdminController {
         userService.changeUserRole(userId, role);
         return "redirect:/admin/users";
     }
+    @PostMapping("/admin/users/delete")
+    public String deleteUser(@RequestParam Long userId) {
+        userService.deleteUser(userId);
+        return "redirect:/admin/users";
+    }
 }

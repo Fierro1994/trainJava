@@ -253,12 +253,8 @@ textarea {
 /* Бургер-меню стили */
 .burger {
     display: none;
-    flex-direction: column;
     cursor: pointer;
-    position: fixed;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
+
 }
 
 .burger div {
@@ -275,6 +271,7 @@ textarea {
 @media (max-width: 768px) {
     header {
         background-color: #fff;
+        height: 10px;
     }
 
     .container {
@@ -320,31 +317,36 @@ textarea {
     }
 
     .burger {
-        height: 30px;
-        width: 30px;
+        z-index: 100;
+        position: fixed;
+        top: 0%;
+        right: 4%;
+        height: 40px;
+        width: 40px;
         display: flex;
-        background: url('menu_icon.png')
-        no-repeat center/cover;
         transition: transform 0.3s ease;
+    }
+
+        .burger svg{
+        transform:rotate(90deg);
+        transition: all 0.3s ease;
     }
 
     .menu-items {
         position: fixed;
-        top: 0;
         right: 0;
-        height: 100%;
+        height: 90vh;
         width: 110px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
-        transform: translateX(100%);
+        transform: translateY(100%);
         transition: transform 0.3s ease;
     }
 
     .menu-items.active {
-        transform: translateX(0);
+        transform: translateY(0);
     }
 
     .menu-items a {
@@ -355,14 +357,10 @@ textarea {
         text-decoration: none;
         font-weight: bold;
         font-size: 82%;
-        transition: background-color 0.3s
-    ease;
+        transition: background-color 0.3s ease;
 }
 
-
-    .burger.active {
-        background: url('menu_icon_right.png')
-        no-repeat center/cover;
-        transform: translateY(-50%) translateX(-106px);
+    .burger.active svg{
+        transform:rotate(-90deg)
     }
 }

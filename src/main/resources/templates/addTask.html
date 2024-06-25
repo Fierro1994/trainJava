@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <title>Add Task</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
     <!-- Подключаем Quill -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -9,13 +10,25 @@
 <body>
 <header>
     <nav>
-        <ul>
+        <span class="burger" id="burger" onclick="toggleMenu()">
+        </span>
+        <ul id="nav-links">
             <li><a th:href="@{/}">Профиль</a></li>
-            <li><a th:href="@{/tasks/list}">Все задачи</a></li>
-            <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
-            <li><a th:href="@{/test}">Начать тест</a></li>
+            <li><a th:href="@{/tasks/list}">Задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить</a></li>
+            <li><a th:href="@{/test}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление пользователями</a>
+                <a th:href="@{/admin/users}">Управление</a>
+            </li>
+            <li><a th:href="@{/logout}">Выйти</a></li>
+        </ul>
+        <ul class="menu-items" id="menu-items">
+            <li><a th:href="@{/}">Профиль</a></li>
+            <li><a th:href="@{/tasks/list}">Задачи</a></li>
+            <li><a th:href="@{/tasks/add}">Добавить</a></li>
+            <li><a th:href="@{/test}">Тест</a></li>
+            <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a th:href="@{/admin/users}">Управление</a>
             </li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
@@ -66,6 +79,7 @@
 <!-- Подключаем Quill -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
+
     var quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
@@ -84,6 +98,9 @@
     document.querySelector('form').onsubmit = function () {
         document.getElementById("theory").value = quill.root.innerHTML;
     };
+    function toggleMenu() {
+        var navLinks = document.getElementById('nav-links');
+        navLinks.classList.toggle('active');
 </script>
 </body>
 </html>

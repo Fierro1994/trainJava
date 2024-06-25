@@ -8,13 +8,25 @@
 <body>
 <header>
   <nav>
-    <ul>
+        <span class="burger" id="burger" onclick="toggleMenu()">
+        </span>
+    <ul id="nav-links">
       <li><a th:href="@{/}">Профиль</a></li>
-      <li><a th:href="@{/tasks/list}">Все задачи</a></li>
-      <li><a th:href="@{/tasks/add}">Добавить задачу</a></li>
-      <li><a th:href="@{/test}">Начать тест</a></li>
+      <li><a th:href="@{/tasks/list}">Задачи</a></li>
+      <li><a th:href="@{/tasks/add}">Добавить</a></li>
+      <li><a th:href="@{/test}">Тест</a></li>
       <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-        <a th:href="@{/admin/users}">Управление пользователями</a>
+        <a th:href="@{/admin/users}">Управление</a>
+      </li>
+      <li><a th:href="@{/logout}">Выйти</a></li>
+    </ul>
+    <ul class="menu-items" id="menu-items">
+      <li><a th:href="@{/}">Профиль</a></li>
+      <li><a th:href="@{/tasks/list}">Задачи</a></li>
+      <li><a th:href="@{/tasks/add}">Добавить</a></li>
+      <li><a th:href="@{/test}">Тест</a></li>
+      <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+        <a th:href="@{/admin/users}">Управление</a>
       </li>
       <li><a th:href="@{/logout}">Выйти</a></li>
     </ul>

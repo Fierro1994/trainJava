@@ -26,11 +26,16 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
-        if (userService.loadUserByUsername(user.getUsername()) != null) {
+        System.out.println(user.getUsername());
+        if (userService.findByUsername(user.getUsername()) != null) {
+            System.out.println("проверка");
             model.addAttribute("errorMessage", "Username already exists.");
             return "register";
         }
-        authService.register(user, RoleName.ROLE_USER); // По умолчанию назначаем роль пользователя
+
+
+        System.out.println("дальше");
+        authService.register(user, RoleName.ROLE_USER);
         return "redirect:/login";
     }
 }

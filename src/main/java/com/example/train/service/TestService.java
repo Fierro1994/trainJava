@@ -4,16 +4,13 @@ import com.example.train.entity.Task;
 import com.example.train.entity.User;
 import com.example.train.repos.TasksRepos;
 import com.example.train.repos.UserRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TestService {
@@ -63,12 +60,12 @@ public class TestService {
         answerInfo.put("taskId", currentTask.getId());
 
         userAnswers.add(answerInfo);
-        User user = userRepository.findByUsername(currentUser.getUsername());
+        Optional<User> user = userRepository.findByUsername(currentUser.getUsername());
         if (isCorrect) {
             correctCount++;
-            recordTestAttempt(user, true, taskRepository.findById(taskId).get());
+            recordTestAttempt(user.get(), true, taskRepository.findById(taskId).get());
         } else {
-            recordTestAttempt(user, false, taskRepository.findById(taskId).get());
+            recordTestAttempt(user.get(), false, taskRepository.findById(taskId).get());
         }
 
         return getTestPage(model);

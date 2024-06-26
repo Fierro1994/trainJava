@@ -37,7 +37,7 @@
 <div class="container">
   <h1 class="h1_main">Информация о задаче</h1>
   <div class="button-container">
-    <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
+    <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
       <button type="submit" class="btn btn-red">Удалить задачу</button>
     </form>
   </div>

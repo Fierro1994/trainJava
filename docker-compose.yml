@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: AstonTrain2024
       MYSQL_DATABASE: train
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
   myapp-main:

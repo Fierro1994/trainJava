@@ -40,7 +40,7 @@
     <ul class="results-list">
         <li th:each="answerInfo : ${userAnswers}" class="result-item" data-task-id="${answerInfo['taskId']}">
             <p><strong>Вопрос:</strong> <span th:text="${answerInfo['question']}"></span></p>
-            <p><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 2, 2)} + '%'"></span></p>
+            <p th:if="${answerInfo['similarity']}"><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 2, 2)} + '%'"></span></p>
             <div class="answer-container">
                 <div class="answer-block correct-answer">
                     <p><strong>Правильный ответ:</strong></p>

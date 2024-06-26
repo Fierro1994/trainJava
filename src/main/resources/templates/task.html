@@ -18,8 +18,7 @@
       <li><a th:href="@{/tasks/add}">Добавить</a></li>
       <li><a th:href="@{/test}">Тест</a></li>
       <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-        <a th:href="@{/admin/users}">Управление</a>
-      </li>
+        <a th:href="@{/admin/users}">Управление</a></li>
       <li><a th:href="@{/logout}">Выйти</a></li>
     </ul>
     <ul class="menu-items" id="menu-items">
@@ -28,8 +27,7 @@
       <li><a th:href="@{/tasks/add}">Добавить</a></li>
       <li><a th:href="@{/test}">Тест</a></li>
       <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-        <a th:href="@{/admin/users}">Управление</a>
-      </li>
+        <a th:href="@{/admin/users}">Управление</a></li>
       <li><a th:href="@{/logout}">Выйти</a></li>
     </ul>
   </nav>
@@ -49,9 +47,15 @@
     <label class="label_main" for="question">Вопрос:</label>
     <p th:text="${task.question}" id="question" class="info-text"></p>
   </div>
-  <div class="info-section">
+  <div class="info-section" th:if="${!task.isMultipleChoice}">
     <label class="label_main" for="answer">Ответ:</label>
     <p th:text="${task.answer}" id="answer" class="info-text"></p>
+  </div>
+  <div class="info-section" th:if="${task.isMultipleChoice}">
+    <label class="label_main" for="options">Варианты ответов:</label>
+    <ul id="options" class="info-ul">
+      <li th:each="option, iterStat : ${task.options}"   th:text="${option}"  th:style="${iterStat.index == task.correctOptionIndex} ? 'color: green;'"  th:classappend="${iterStat.index == task.correctOptionIndex} ? 'correct-answer' : ''"></li>
+    </ul>
   </div>
   <div class="info-section">
     <label class="label_main" for="theoryText">Теория:</label>
@@ -60,11 +64,13 @@
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script>function toggleMenu() {
-  var menuItems = document.getElementById('menu-items');
-  var burger = document.getElementById('burger');
-  menuItems.classList.toggle('active');
-  burger.classList.toggle('active');
-}</script>
+<script>
+  function toggleMenu() {
+    var menuItems = document.getElementById('menu-items');
+    var burger = document.getElementById('burger');
+    menuItems.classList.toggle('active');
+    burger.classList.toggle('active');
+  }
+</script>
 </body>
 </html>

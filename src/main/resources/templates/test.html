@@ -37,13 +37,25 @@
     </nav>
 </header>
 <div class="container">
+
     <div th:if="${errorMessage}">
         <p th:text="${errorMessage}" class="error-message"></p>
     </div>
     <form th:action="@{/test/submit}" method="post">
         <input type="hidden" name="taskId" th:value="${task.id}" />
+        <input type="hidden" name="timePerQuestion" th:value="${timePerQuestion}" />
         <p class="question-text" th:text="${task.question}"></p>
-        <textarea name="answer" required></textarea>
+        <div th:if="${task.isMultipleChoice}">
+            <ul>
+                <li class="list_tests_radio" th:each="option, iterStat : ${task.options}">
+                        <input class="correct_option_test" type="radio" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
+                        <label th:for="${'option' + iterStat.index}" th:text="${option}">Label</label>
+                </li>
+            </ul>
+        </div>
+        <div th:if="${!task.isMultipleChoice}">
+            <textarea name="answer" required></textarea>
+        </div>
         <div class="button-container">
             <button class="btn" type="submit">Ответить</button>
         </div>
@@ -54,11 +66,33 @@
         </div>
     </form>
 </div>
+<script>
+    function toggleMenu() {
+        var menuItems = document.getElementById('menu-items');
+        var burger = document.getElementById('burger');
+        menuItems.classList.toggle('active');
+        burger.classList.toggle('active');
+    }
+
+
+        if ([[${timePerQuestion}]] !== null){
+    const timePerQuestion = [[${timePerQuestion}]];
+    if (timePerQuestion && timePerQuestion > 0) {
+    let timeLeft = timePerQuestion;
+    const timerElement = document.createElement('p');
+    timerElement.id = 'timer';
+    document.querySelector('.container').prepend(timerElement);
+
+    const timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    document.querySelector('form').submit(); // Auto-submit the form when time's up
+    } else {
+    timerElement.textContent = `Осталось времени: ${timeLeft--} секунд`;
+    }
+    }, 1000);
+    }
+    }
+</script>
 </body>
-<script>function toggleMenu() {
-    var menuItems = document.getElementById('menu-items');
-    var burger = document.getElementById('burger');
-    menuItems.classList.toggle('active');
-    burger.classList.toggle('active');
-}</script>
 </html>

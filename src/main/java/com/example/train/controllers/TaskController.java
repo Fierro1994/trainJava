@@ -31,11 +31,14 @@ public class TaskController {
 
     @PostMapping("/save")
     public String save(@RequestParam String question,
-                       @RequestParam String answer,
+                       @RequestParam(required = false) String answer,
                        @RequestParam String theory,
                        @RequestParam CategoryNames category,
+                       @RequestParam boolean isMultipleChoice,
+                       @RequestParam(required = false) List<String> options,
+                       @RequestParam(required = false) Integer correctOption,
                        Model model) throws MalformedURLException, URISyntaxException {
-        return taskService.saveTask(question, answer, theory, category, model);
+        return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOption, model);
     }
 
     @GetMapping("/{id}")
@@ -59,10 +62,5 @@ public class TaskController {
     @GetMapping("/random")
     public Task getRandomTask() {
         return taskService.getRandomTask();
-    }
-
-    @PostMapping("/checkAnswer")
-    public String checkAnswer(@RequestParam String answer, Model model) {
-        return taskService.checkAnswer(answer, model);
     }
 }

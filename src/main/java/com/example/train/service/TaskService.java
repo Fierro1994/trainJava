@@ -23,14 +23,19 @@ public class TaskService {
     private List<Long> usedTaskIds = new ArrayList<>();
 
 
-
     @Transactional(rollbackOn = Exception.class)
-    public String saveTask(String question, String answer, String theory, CategoryNames category, Model model) {
+    public String saveTask(String question, String answer, String theory, CategoryNames category, boolean isMultipleChoice, List<String> options, Integer correctOptionIndex, Model model) {
         Task task = new Task();
         task.setQuestion(question);
         task.setAnswer(answer);
         task.setCategory(category);
         task.setTheory(theory);
+        task.setMultipleChoice(isMultipleChoice);
+        if (isMultipleChoice && options != null) {
+            task.setOptions(options);
+            task.setCorrectOptionIndex(correctOptionIndex);
+        }
+
         Task isSimilarTaskExists = isSimilarTaskExists(question);
         if (isSimilarTaskExists != null) {
             model.addAttribute("errorMessage", "Задача с похожим вопросом уже есть ");
@@ -42,7 +47,6 @@ public class TaskService {
         return "redirect:/tasks/" + task.getId();
     }
 
-
     public String getTask(@PathVariable Long id, Model model) {
         Task task = tasksRepos.findById(id).orElse(null);
         if (task == null) {
@@ -50,6 +54,10 @@ public class TaskService {
         }
         model.addAttribute("task", task);
         return "task";
+    }
+
+    public List<Task> getTasksByCategory(CategoryNames category) {
+        return tasksRepos.findByCategory(category);
     }
 
     public String deleteTask(Long id) {
@@ -88,15 +96,6 @@ public class TaskService {
         return task;
     }
 
-    public String checkAnswer(String answer, Model model){
-        Task task = getRandomTask();
-        boolean correct = task.getAnswer().equalsIgnoreCase(answer);
-        String correctAnswer = task.getAnswer();
-        String message = correct ? "Correct!" : "Incorrect. The correct answer is: " + correctAnswer;
-        model.addAttribute("message", message);
-        return "testPage";
-    }
-
     private Task isSimilarTaskExists(String question) {
         List<Task> tasks = tasksRepos.findAll();
         for (Task existingTask : tasks) {
@@ -118,6 +117,7 @@ public class TaskService {
     }
 
     public boolean isAnswerCorrect(String userAnswer, String correctAnswer) {
+
         double similarity = getLevenshteinDistance(userAnswer, correctAnswer);
         return similarity >= SIMILARITY_TEST_ANSWER;
     }

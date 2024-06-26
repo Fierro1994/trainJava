@@ -2,14 +2,19 @@ package com.example.train.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
 @NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "tasks")
 public class Task {
     @Id
@@ -23,5 +28,14 @@ public class Task {
     private String theory;
     @Enumerated(EnumType.STRING)
     private CategoryNames category;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> options;
+
+    private boolean isMultipleChoice;
+
+    private Integer correctOptionIndex;
+    @ManyToMany(mappedBy = "tasksForReview", fetch = FetchType.LAZY)
+    private Set<User> users;
+
 
 }

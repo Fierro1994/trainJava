@@ -1,5 +1,7 @@
 package com.example.train.controllers;
 
+import com.example.train.entity.CategoryNames;
+import com.example.train.service.TaskService;
 import com.example.train.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,30 +13,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/test")
 public class TestController {
     @Autowired
     private TestService testService;
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping
-    public String getTestPage(Model model) {
-        try {
-            testService.initializeTest();
-            return testService.getTestPage(model);
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Ошибка загрузки теста");
-            return "error";
-        }
+    public String testConfig(Model model) {
+        return "testConfig";
     }
+
+    @GetMapping("/start")
+    public String startTest(@RequestParam(required = false) Integer timePerQuestion,
+                            @RequestParam(required = false) CategoryNames category,
+                            Model model) {
+
+        testService.initializeTest();
+        return testService.getTestPage(model, timePerQuestion, category);
+    }
+
+
 
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
                                @RequestParam("taskId") Long taskId,
-                               @RequestParam("answer") String answer, Model model) {
+                               @RequestParam(value = "answer", required = false) String answer ,
+                               @RequestParam(required = false) Integer timePerQuestion,
+                               @RequestParam(required = false) CategoryNames category, Model model) {
         try {
-            return testService.submitAnswer(taskId, answer, model, currentUser);
+            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category);
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка отправки ответа");
             return "error";

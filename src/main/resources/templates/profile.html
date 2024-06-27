@@ -35,7 +35,8 @@
 </header>
 <div class="container">
     <h1>Профиль</h1>
-    <p>Имя пользователя: <span th:text="${user.username}"></span></p>
+    <p>Имя пользователя: <span  th:text="${user.username}"></span></p>
+    <p>E-mail: <span th:if="${user.email}" th:text="${user.email}"></span></p>
     <h2>Статистика</h2>
     <p>Количество попыток пройти тест: <span th:text="${user.testAttempts}"></span></p>
     <p>Количество правильных ответов: <span th:text="${user.correctAnswers}"></span></p>

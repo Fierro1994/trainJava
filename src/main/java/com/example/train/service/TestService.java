@@ -128,7 +128,8 @@ public class TestService {
 
     public String finishTest(Model model, UserDetails currentUser) {
         Optional<User> user =   userRepository.findByUsername(currentUser.getUsername());
-        user.ifPresent(value -> value.setTestAttempts(value.getTestAttempts() + 1));
+        user.get().setTestAttempts(user.get().getTestAttempts() + 1);
+        userRepository.save(user.get());
         model.addAttribute("correctCount", correctCount);
         model.addAttribute("totalQuestions", countQuestions);
         model.addAttribute("userAnswers", userAnswers);

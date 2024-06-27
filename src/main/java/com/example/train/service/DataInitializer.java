@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DataInitializer {
-
+    @Value("${myapp.passwordDb}")
+    private String password;
     @Autowired
     private AuthService authService;
 
@@ -22,7 +23,7 @@ public class DataInitializer {
                 User admin = new User();
                 admin.setUsername("fierro1994");
                 admin.setEmail("26roma261994@mail.ru");
-                admin.setPassword("DD52joexcmk!");
+                admin.setPassword(password);
                 authService.register(admin, RoleName.ROLE_ADMIN);
                 System.out.println("Админ создан");
             }

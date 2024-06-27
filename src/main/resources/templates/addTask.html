@@ -53,16 +53,14 @@
             <label for="isMultipleChoice">Тип ответа:</label>
             <select id="isMultipleChoice" name="isMultipleChoice" required onchange="toggleOptions(this.value)">
                 <option value="false">Текстовый ответ</option>
-                <option value="true">выбор из готовых</option>
+                <option value="true">Выбор из готовых</option>
             </select>
         </div>
         <div class="form-group" id="textAnswerGroup">
             <label for="answer">Ответ:</label>
             <textarea id="answer" name="answer" required></textarea>
         </div>
-        <div class="form-group" id="multipleChoiceGroup">
-
-        </div>
+        <div class="form-group" id="multipleChoiceGroup"></div>
         <div class="form-group">
             <label for="theory">Теория:</label>
             <div id="editor" style="height: 500px;"></div>
@@ -83,8 +81,6 @@
         <div id="theoryPreview" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;"></div>
     </div>
 </div>
-
-
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
@@ -112,26 +108,24 @@
             document.getElementById("textAnswerGroup").innerHTML = "";
             document.getElementById("textAnswerGroup").style.display = "none";
             document.getElementById("multipleChoiceGroup").style.display = "block";
-            document.getElementById("multipleChoiceGroup").innerHTML =`
-             <label for="optionsContainer">Варианты ответов:</label>
-        <div id="optionsContainer">
-        <div class="option-item">
-        <input type="text" name="options" class="option-input" required />
-  <input type="radio" id="correctOption0" name="correctOption" class="correct-option" value="0" required />
-  <label for="correctOption0"></label>
-
-     <button class="btn_remove_check" type="button" onclick="removeOption(this)">Удалить</button>
-        </div>
-        </div>
-        <button class="btn_add_check" type="button" onclick="addOption()">Добавить вариант</button>
+            document.getElementById("multipleChoiceGroup").innerHTML = `
+                <label for="optionsContainer">Варианты ответов:</label>
+                <div id="optionsContainer">
+                    <div class="option-item">
+                        <input type="text" name="options" class="option-input" required />
+                        <input type="checkbox" id="correctOption0" name="correctOptions" class="correct-option" value="0" />
+                        <label for="correctOption0"></label>
+                        <button class="btn_remove_check" type="button" onclick="removeOption(this)">Удалить</button>
+                    </div>
+                </div>
+                <button class="btn_add_check" type="button" onclick="addOption()">Добавить вариант</button>
             `;
         } else {
-
-            document.getElementById("textAnswerGroup").innerHTML =`
-        <label for="answer">Ответ:</label>
-        <textarea id="answer" name="answer" required></textarea>
-        `;
-            document.getElementById("multipleChoiceGroup").innerHTML="";
+            document.getElementById("textAnswerGroup").innerHTML = `
+                <label for="answer">Ответ:</label>
+                <textarea id="answer" name="answer" required></textarea>
+            `;
+            document.getElementById("multipleChoiceGroup").innerHTML = "";
             document.getElementById("multipleChoiceGroup").style.display = "none";
             document.getElementById("textAnswerGroup").style.display = "block";
         }
@@ -144,7 +138,7 @@
         optionItem.classList.add("option-item");
         optionItem.innerHTML = `
             <input type="text" name="options" class="option-input" required />
-            <input id="correctOption${optionIndex}" type="radio" name="correctOption" class="correct-option" value="${optionIndex}" required />
+            <input id="correctOption${optionIndex}" type="checkbox" name="correctOptions" class="correct-option" value="${optionIndex}" />
             <label for="correctOption${optionIndex}"></label>
             <button class="btn_remove_check" type="button" onclick="removeOption(this)">Удалить</button>
         `;

@@ -36,9 +36,9 @@ public class TaskController {
                        @RequestParam CategoryNames category,
                        @RequestParam boolean isMultipleChoice,
                        @RequestParam(required = false) List<String> options,
-                       @RequestParam(required = false) Integer correctOption,
+                       @RequestParam(required = false) List<Integer> correctOptions,
                        Model model) throws MalformedURLException, URISyntaxException {
-        return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOption, model);
+        return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
     }
 
     @GetMapping("/{id}")

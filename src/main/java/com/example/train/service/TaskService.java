@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -30,16 +31,21 @@ public class TaskService {
 
 
     @Transactional(rollbackOn = Exception.class)
-    public String saveTask(String question, String answer, String theory, CategoryNames category, boolean isMultipleChoice, List<String> options, Integer correctOptionIndex, Model model) {
+    public String saveTask(String question, String answer, String theory, CategoryNames category, boolean isMultipleChoice, List<String> options, List<Integer> correctOptionIndexes, Model model) {
         Task task = new Task();
         task.setQuestion(question);
         task.setAnswer(answer);
         task.setCategory(category);
         task.setTheory(theory);
         task.setMultipleChoice(isMultipleChoice);
-        if (isMultipleChoice && options != null) {
+
+        if (options != null) {
             task.setOptions(options);
-            task.setCorrectOptionIndex(correctOptionIndex);
+        }
+        if (isMultipleChoice && correctOptionIndexes != null) {
+            task.setCorrectOptionIndexes(new HashSet<>(correctOptionIndexes));
+        } else if (!isMultipleChoice && correctOptionIndexes != null && !correctOptionIndexes.isEmpty()) {
+            task.setCorrectOptionIndexes(Set.of(correctOptionIndexes.get(0)));
         }
 
         Task isSimilarTaskExists = isSimilarTaskExists(question);

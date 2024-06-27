@@ -28,7 +28,6 @@ public class TestController {
     public String testConfig(Model model) {
         return "testConfig";
     }
-
     @GetMapping("/start")
     public String startTest(@AuthenticationPrincipal UserDetails currentUser,
                             @RequestParam(required = false) Integer timePerQuestion,
@@ -45,7 +44,6 @@ public class TestController {
         testService.initializeTest(numberOfQuestions);
         return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
     }
-
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
                                @RequestParam("taskId") Long taskId,

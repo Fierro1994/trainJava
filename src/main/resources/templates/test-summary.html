@@ -44,7 +44,12 @@
             <div class="answer-container">
                 <div class="answer-block correct-answer">
                     <p><strong>Правильный ответ:</strong></p>
-                    <p th:text="${answerInfo['correctAnswer']}"></p>
+                    <th:block th:if="${answerInfo['task'].isMultipleChoice}">
+                        <ul>
+                            <li th:each="correctAnswer : ${answerInfo['correctAnswers']}" th:text="${correctAnswer}"></li>
+                        </ul>
+                    </th:block>
+                    <p th:if="${!answerInfo['task'].isMultipleChoice}" th:text="${answerInfo['correctAnswer']}"></p>
                 </div>
                 <div class="answer-block user-answer">
                     <p><strong>Твой ответ:</strong></p>
@@ -58,47 +63,64 @@
     <a class="btn" th:href="@{/test}">Начать новый тест</a>
 </div>
 <script>
+    function getCorrectAnswer(correctAnswerElem) {
+        const ulElement = correctAnswerElem.querySelector('ul');
+        if (ulElement) {
+            return Array.from(ulElement.querySelectorAll('li')).map(li => li.textContent.trim()).join(',');
+        } else {
+            return correctAnswerElem.querySelector('p:nth-of-type(2)').textContent.trim();
+        }
+    }
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.result-item').forEach(function(item) {
-            const taskId = item.getAttribute('data-task-id');
-            const correctAnswerElem = item.querySelector('.correct-answer p:nth-of-type(2)');
-            const userAnswerElem = item.querySelector('.user-answer p:nth-of-type(2)');
+            const correctAnswerElem = item.querySelector('.correct-answer');
+            const userAnswerElem = item.querySelector('.user-answer');
 
             if (correctAnswerElem && userAnswerElem) {
-                const correctAnswer = correctAnswerElem.innerText;
-                const userAnswer = userAnswerElem.innerText;
+                const correctAnswerTextElem = correctAnswerElem.querySelector('p:nth-of-type(2), ul');
+                const userAnswerTextElem = userAnswerElem.querySelector('p:nth-of-type(2)');
 
-                function highlightDifferences(correct, user) {
-                    const correctWords = correct.split(' ');
-                    const userWords = user.split(' ');
 
-                    const maxLen = Math.max(correctWords.length, userWords.length);
-                    let highlightedCorrect = '';
-                    let highlightedUser = '';
+                if (correctAnswerTextElem && userAnswerTextElem) {
+                    const correctAnswer = getCorrectAnswer(correctAnswerElem);
+                    const userAnswer = userAnswerTextElem.innerText.trim();
 
-                    for (let i = 0; i < maxLen; i++) {
-                        if (correctWords[i] === userWords[i]) {
-                            highlightedCorrect += `<span class="highlight-green">${correctWords[i]}</span> `;
-                            highlightedUser += `<span class="highlight-green">${userWords[i]}</span> `;
-                        } else {
-                            if (correctWords[i]) {
-                                highlightedCorrect += `<span class="highlight-red">${correctWords[i]}</span> `;
-                            }
-                            if (userWords[i]) {
-                                highlightedUser += `<span class="highlight-red">${userWords[i]}</span> `;
+                    function highlightDifferences(correct, user) {
+                        const correctWords = correct.split(' ');
+                        const userWords = user.split(' ');
+
+                        const maxLen = Math.max(correctWords.length, userWords.length);
+                        let highlightedCorrect = '';
+                        let highlightedUser = '';
+
+                        for (let i = 0; i < maxLen; i++) {
+                            if (correctWords[i] === userWords[i]) {
+                                highlightedCorrect += `<span class="highlight-green">${correctWords[i]}</span> `;
+                                highlightedUser += `<span class="highlight-green">${userWords[i]}</span> `;
+                            } else {
+                                if (correctWords[i]) {
+                                    highlightedCorrect += `<span class="highlight-red">${correctWords[i]}</span> `;
+                                }
+                                if (userWords[i]) {
+                                    highlightedUser += `<span class="highlight-red">${userWords[i]}</span> `;
+                                }
                             }
                         }
+                        return { highlightedCorrect, highlightedUser };
                     }
-                    return { highlightedCorrect, highlightedUser };
+
+                    const { highlightedCorrect, highlightedUser } = highlightDifferences(correctAnswer, userAnswer);
+                    correctAnswerTextElem.innerHTML = highlightedCorrect;
+                    userAnswerTextElem.innerHTML = highlightedUser;
+                } else {
+                    console.log("Could not find answer text elements");
                 }
-
-                const { highlightedCorrect, highlightedUser } = highlightDifferences(correctAnswer, userAnswer);
-
-                correctAnswerElem.innerHTML = highlightedCorrect;
-                userAnswerElem.innerHTML = highlightedUser;
+            } else {
+                console.log("Could not find correctAnswerElem or userAnswerElem");
             }
         });
     });
+
     function toggleMenu() {
         var menuItems = document.getElementById('menu-items');
         var burger = document.getElementById('burger');

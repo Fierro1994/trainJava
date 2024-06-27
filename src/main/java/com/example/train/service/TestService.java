@@ -97,19 +97,32 @@ public class TestService {
             model.addAttribute("errorMessage", "Task not found.");
             return "error";
         }
-        double similarity;
+        double similarity = 0.0;
         boolean isCorrect;
         Map<String, Object> answerInfo = new HashMap<>();
         if (currentTask.isMultipleChoice()) {
-            isCorrect = currentTask.getOptions().get(currentTask.getCorrectOptionIndex()).equals(answer);
-            similarity = 0.0;
-            answerInfo.put("correctAnswer", currentTask.getOptions().get(currentTask.getCorrectOptionIndex()));
+            Set<String> correctAnswers = new HashSet<>();
+            StringBuilder stringBuilder = new StringBuilder();
+
+                int count = 0;
+                for (Integer index : currentTask.getCorrectOptionIndexes()) {
+                    if (count > 0) {
+                        stringBuilder.append(",");
+                    }
+                    stringBuilder.append(currentTask.getOptions().get(index));
+                    count++;
+                }
+
+            correctAnswers.add(stringBuilder.toString());
+            isCorrect = correctAnswers.contains(answer);
+
+            answerInfo.put("correctAnswers", correctAnswers);
         } else {
             similarity = taskService.getSimilarityPercentage(answer, currentTask.getAnswer());
             isCorrect = taskService.isAnswerCorrect(answer, currentTask.getAnswer());
             answerInfo.put("correctAnswer", currentTask.getAnswer());
         }
-
+        answerInfo.put("task", currentTask);
         answerInfo.put("question", currentTask.getQuestion());
         answerInfo.put("similarity", similarity);
         answerInfo.put("userAnswer", answer);
@@ -144,7 +157,6 @@ public class TestService {
         }
         userRepository.save(user); // Сохраняем изменения в базе данных
     }
-
 
     public String finishTest(Model model, UserDetails currentUser) {
         Optional<User> user = userRepository.findByUsername(currentUser.getUsername());

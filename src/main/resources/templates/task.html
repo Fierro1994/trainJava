@@ -56,8 +56,10 @@
   <div class="info-section" th:if="${task.isMultipleChoice}">
     <label class="label_main" for="options">Варианты ответов:</label>
     <ul id="options" class="info-ul">
-      <li th:each="option, iterStat : ${task.options}"   th:text="${option}"  th:style="${iterStat.index == task.correctOptionIndex} ? 'color: green;'"  th:classappend="${iterStat.index == task.correctOptionIndex} ? 'correct-answer' : ''"></li>
-    </ul>
+      <li th:each="option, iterStat : ${task.options}"
+          th:text="${option}"
+          th:classappend="${#lists.contains(task.correctOptionIndexes, iterStat.index)} ? 'correct-answer' : ''"
+          th:style="${#lists.contains(task.correctOptionIndexes, iterStat.index)} ? 'color: green;' : ''"></li>    </ul>
   </div>
   <div class="info-section">
     <label class="label_main" for="theoryText">Теория:</label>

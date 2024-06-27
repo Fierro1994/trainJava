@@ -53,10 +53,10 @@
         <div th:if="${task.isMultipleChoice}">
             <ul>
                 <li class="list_tests_radio" th:each="option, iterStat : ${task.options}">
-                    <input class="correct_option_test" type="radio" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
+                    <input class="correct_option_test" type="checkbox" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
                     <label th:for="${'option' + iterStat.index}" th:text="${option}">Label</label>
-                    </li>
-                    </ul>
+                </li>
+            </ul>
         </div>
         <div th:if="${!task.isMultipleChoice}">
             <textarea name="answer" required></textarea>

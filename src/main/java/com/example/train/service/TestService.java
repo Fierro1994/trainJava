@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -21,6 +20,7 @@ public class TestService {
 
     private List<Task> questions = new ArrayList<>();
     private List<Map<String, Object>> userAnswers = new ArrayList<>();
+    private Integer countQuestions;
     private int correctCount = 0;
     @Autowired
     private TasksRepos taskRepository;
@@ -34,13 +34,14 @@ public class TestService {
         userAnswers.clear();
         taskService.resetUsedTasks();
         questions = taskService.getAllTasks();
+        countQuestions = questions.size();
     }
 
-    public String getTestPage(Model model,Integer timePerQuestion, CategoryNames category) {
+    public String getTestPage(UserDetails currentUser, Model model,Integer timePerQuestion, CategoryNames category) {
         Task task = getNextQuestion(category);;
 
         if (task == null) {
-            return finishTest(model);
+            return finishTest(model, currentUser);
         }
 
         if (timePerQuestion == null){
@@ -88,11 +89,10 @@ public class TestService {
             recordTestAttempt(user.get(), false, taskRepository.findById(taskId).get());
         }
 
-        return getTestPage(model, timePerQuestion, category);
+        return getTestPage(currentUser, model, timePerQuestion, category);
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
-        user.setTestAttempts(user.getTestAttempts() + 1);
         if (isCorrect) {
             user.setCorrectAnswers(user.getCorrectAnswers() + 1);
         } else {
@@ -109,12 +109,14 @@ public class TestService {
         Stream<Task> availableQuestionsStream = questions.stream()
                 .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
         if (category != null) {
+            countQuestions = questions.stream()
+                    .filter(task -> task.getCategory().name().equals( category.name())).toList().size();
             availableQuestionsStream = availableQuestionsStream
                     .filter(task -> task.getCategory().name().equals( category.name()));
         }
 
         List<Task> availableQuestions = availableQuestionsStream.toList();
-        System.out.println(availableQuestions);
+
         if (!availableQuestions.isEmpty()) {
             Random random = new Random();
             int randomIndex = random.nextInt(availableQuestions.size());
@@ -124,9 +126,11 @@ public class TestService {
     }
 
 
-    public String finishTest(Model model) {
+    public String finishTest(Model model, UserDetails currentUser) {
+        Optional<User> user =   userRepository.findByUsername(currentUser.getUsername());
+        user.ifPresent(value -> value.setTestAttempts(value.getTestAttempts() + 1));
         model.addAttribute("correctCount", correctCount);
-        model.addAttribute("totalQuestions", questions.size());
+        model.addAttribute("totalQuestions", countQuestions);
         model.addAttribute("userAnswers", userAnswers);
         taskService.resetUsedTasks();
         return "test-summary";

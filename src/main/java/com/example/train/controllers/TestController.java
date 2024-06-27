@@ -30,20 +30,20 @@ public class TestController {
     }
 
     @GetMapping("/start")
-    public String startTest(@RequestParam(required = false) Integer timePerQuestion,
+    public String startTest(@AuthenticationPrincipal UserDetails currentUser,
+                            @RequestParam(required = false) Integer timePerQuestion,
                             @RequestParam(required = false) CategoryNames category,
                             Model model) {
 
         testService.initializeTest();
-        return testService.getTestPage(model, timePerQuestion, category);
+        return testService.getTestPage(currentUser, model, timePerQuestion, category);
     }
-
 
 
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
                                @RequestParam("taskId") Long taskId,
-                               @RequestParam(value = "answer", required = false) String answer ,
+                               @RequestParam(value = "answer", required = false) String answer,
                                @RequestParam(required = false) Integer timePerQuestion,
                                @RequestParam(required = false) CategoryNames category, Model model) {
         try {
@@ -55,9 +55,9 @@ public class TestController {
     }
 
     @GetMapping("/finish")
-    public String finishTest(Model model) {
+    public String finishTest(@AuthenticationPrincipal UserDetails currentUser, Model model) {
         try {
-            return testService.finishTest(model);
+            return testService.finishTest(model, currentUser);
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка завершения теста");
             return "error";

@@ -2,7 +2,9 @@ package com.example.train.service;
 
 import com.example.train.entity.CategoryNames;
 import com.example.train.entity.Task;
+import com.example.train.entity.User;
 import com.example.train.repos.TasksRepos;
+import com.example.train.repos.UserRepository;
 import jakarta.transaction.Transactional;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
@@ -20,6 +23,8 @@ public class TaskService {
     private final double SIMILARITY_TEST_ANSWER = 80;
     @Autowired
     private TasksRepos tasksRepos;
+    @Autowired
+    private UserRepository userRepository;
     private List<Long> usedTaskIds = new ArrayList<>();
 
 
@@ -61,13 +66,15 @@ public class TaskService {
     }
 
     public String deleteTask(Long id) {
+
         Task task = tasksRepos.findById(id).orElse(null);
-        if (task != null) {
-            tasksRepos.delete(task);
-            return "redirect:/tasks"; // Redirect to the tasks list page
-        } else {
-            return "redirect:/error"; // Redirect to an error page
+        Set<User> users = task.getUsers();
+        for (User user : users) {
+            user.getTasksForReview().remove(task);
+            userRepository.save(user);
         }
+        tasksRepos.delete(task);
+        return "redirect:/tasks";
     }
 
     public List<Task> getAllTasks() {

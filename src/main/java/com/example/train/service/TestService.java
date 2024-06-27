@@ -22,6 +22,7 @@ public class TestService {
     private List<Map<String, Object>> userAnswers = new ArrayList<>();
     private Integer countQuestions;
     private int correctCount = 0;
+    private List<Task> availableQuestions = new ArrayList<>();
     @Autowired
     private TasksRepos taskRepository;
     @Autowired
@@ -34,6 +35,7 @@ public class TestService {
         userAnswers.clear();
         taskService.resetUsedTasks();
         questions = taskService.getAllTasks();
+        availableQuestions = new ArrayList<>(questions);
         if (numberOfQuestions == null || numberOfQuestions <= 0) {
             countQuestions = questions.size();
         } else {
@@ -44,8 +46,8 @@ public class TestService {
     }
 
     public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
-        Task task = getNextQuestion(category, questionType);
 
+        Task task = getNextQuestion(category, questionType);
         if (task == null && userAnswers.isEmpty()) {
             return "noQuestions";
         } else if (task == null) {
@@ -67,20 +69,36 @@ public class TestService {
     }
 
     private Task getNextQuestion(CategoryNames category, String questionType) {
-        Stream<Task> availableQuestionsStream = questions.stream()
-                .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
-
+        Iterator<Task> iterator = availableQuestions.iterator();
+        while (iterator.hasNext()) {
+            Task task = iterator.next();
+            for (Map<String, Object> answer : userAnswers) {
+                if (task.getQuestion().equals(answer.get("question"))) {
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
         if (category != null) {
-            availableQuestionsStream = availableQuestionsStream
-                    .filter(task -> task.getCategory().name().equals(category.name()));
+            iterator = availableQuestions.iterator();
+            while (iterator.hasNext()) {
+                Task task = iterator.next();
+                if (!task.getCategory().name().equals(category.name())) {
+                    iterator.remove();
+                }
+            }
         }
-
         if (questionType != null && !questionType.isEmpty()) {
-            availableQuestionsStream = availableQuestionsStream
-                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice());
-        }
+            iterator = availableQuestions.iterator();
+            while (iterator.hasNext()) {
+                Task task = iterator.next();
 
-        List<Task> availableQuestions = availableQuestionsStream.toList();
+                boolean isMultipleChoice = "multipleChoice".equals(questionType);
+                if (task.isMultipleChoice() != isMultipleChoice) {
+                    iterator.remove();
+                }
+            }
+        }
 
         if (availableQuestions.isEmpty()) {
             return null;
@@ -90,6 +108,7 @@ public class TestService {
         int randomIndex = random.nextInt(availableQuestions.size());
         return availableQuestions.get(randomIndex);
     }
+
 
     public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
         Task currentTask = taskRepository.findById(taskId).orElse(null);
@@ -153,9 +172,9 @@ public class TestService {
                 tasksForReview.add(task);
                 user.setTasksForReview(tasksForReview);
             }
-            user.setIncorrectAnswers(user.getIncorrectAnswers() + 1); // Увеличиваем количество неправильных ответов
+            user.setIncorrectAnswers(user.getIncorrectAnswers() + 1);
         }
-        userRepository.save(user); // Сохраняем изменения в базе данных
+        userRepository.save(user);
     }
 
     public String finishTest(Model model, UserDetails currentUser) {
@@ -169,8 +188,7 @@ public class TestService {
             model.addAttribute("totalQuestions", countQuestions);
             model.addAttribute("userAnswers", userAnswers);
             taskService.resetUsedTasks();
-            correctCount = 0;
-            userAnswers.clear();
+
         }
         return "test-summary";
     }

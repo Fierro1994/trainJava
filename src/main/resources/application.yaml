@@ -14,4 +14,11 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
   thymeleaf:
     cache: false
+  mail:
+    host: smtp.mail.ru
+    username: 26roma261994@mail.ru
+    password: S1yL5HeiFmHdBfGaQ5GH
+    port: 465
+    protocol: smtps
+    debug: true
 

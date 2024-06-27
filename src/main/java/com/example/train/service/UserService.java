@@ -38,6 +38,12 @@ public class UserService implements UserDetailsService {
         else return null;
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+
+
 
     public void changeUserRole(Long userId, RoleName role) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));

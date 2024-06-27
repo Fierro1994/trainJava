@@ -22,9 +22,13 @@
                 <button class="btn" type="submit">Войти</button>
             </div>
             <div class="logform">
-                <a th:href="@{/register}">Зарегестрироваться</a></div>
+                <a th:href="@{/register}">Зарегистрироваться</a>
+            </div>
             <div class="logform" th:if="${param.error}">
                 <p class="error-message">Неверное имя пользователя или пароль.</p>
+            </div>
+            <div class="logform">
+                <a th:href="@{/forgotPassword}">Забыли пароль?</a>
             </div>
         </form>
     </div>

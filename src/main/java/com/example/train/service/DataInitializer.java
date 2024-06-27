@@ -20,6 +20,7 @@ public class DataInitializer {
             if (userRepository.findByUsername("fierro1994").isEmpty()) {
                 User admin = new User();
                 admin.setUsername("fierro1994");
+                admin.setEmail("26roma261994@mail.ru");
                 admin.setPassword("DD52joexcmk!");
                 authService.register(admin, RoleName.ROLE_ADMIN);
                 System.out.println("Админ создан");

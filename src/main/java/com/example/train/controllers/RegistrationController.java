@@ -26,15 +26,16 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
-        System.out.println(user.getUsername());
         if (userService.findByUsername(user.getUsername()) != null) {
-            System.out.println("проверка");
             model.addAttribute("errorMessage", "Username already exists.");
             return "register";
         }
 
+        if (userService.findByEmail(user.getEmail()) != null) {
+            model.addAttribute("errorMessage", "Email already exists.");
+            return "register";
+        }
 
-        System.out.println("дальше");
         authService.register(user, RoleName.ROLE_USER);
         return "redirect:/login";
     }

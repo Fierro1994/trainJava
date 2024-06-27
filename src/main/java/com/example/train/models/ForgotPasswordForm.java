@@ -1,0 +1,12 @@
+package com.example.train.models;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class ForgotPasswordForm {
+    private String email;
+}

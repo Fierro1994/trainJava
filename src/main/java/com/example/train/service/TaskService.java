@@ -66,15 +66,19 @@ public class TaskService {
     }
 
     public String deleteTask(Long id) {
-
         Task task = tasksRepos.findById(id).orElse(null);
+        deleteTaskForReview(task);
+        tasksRepos.delete(task);
+        return "redirect:/tasks";
+    }
+
+    public void deleteTaskForReview(Task task) {
+
         Set<User> users = task.getUsers();
         for (User user : users) {
             user.getTasksForReview().remove(task);
             userRepository.save(user);
         }
-        tasksRepos.delete(task);
-        return "redirect:/tasks";
     }
 
     public List<Task> getAllTasks() {

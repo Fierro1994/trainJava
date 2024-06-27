@@ -93,10 +93,13 @@ public class TestService {
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
+        Set<Task> tasksForReview = user.getTasksForReview();
         if (isCorrect) {
+            if (tasksForReview.contains(task)) {
+               taskService.deleteTaskForReview(task);
+            }
             user.setCorrectAnswers(user.getCorrectAnswers() + 1);
         } else {
-            Set<Task> tasksForReview = user.getTasksForReview();
             if (!tasksForReview.contains(task)) {
                 tasksForReview.add(task);
                 user.setTasksForReview(tasksForReview);

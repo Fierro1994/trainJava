@@ -160,6 +160,7 @@ public class TestService {
 
     public String finishTest(Model model, UserDetails currentUser) {
         Optional<User> user = userRepository.findByUsername(currentUser.getUsername());
+
         if (user.isPresent()) {
             User userEntity = user.get();
             userEntity.setTestAttempts(userEntity.getTestAttempts() + 1);
@@ -168,6 +169,8 @@ public class TestService {
             model.addAttribute("totalQuestions", countQuestions);
             model.addAttribute("userAnswers", userAnswers);
             taskService.resetUsedTasks();
+            correctCount = 0;
+            userAnswers.clear();
         }
         return "test-summary";
     }

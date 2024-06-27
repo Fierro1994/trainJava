@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/train
-    username: user
-    password: AstonTrain2024
+    username: ???
+    password: ???
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
@@ -15,8 +15,8 @@ spring:
     cache: false
   mail:
     host: smtp.mail.ru
-    username: 26roma261994@mail.ru
-    password: S1yL5HeiFmHdBfGaQ5GH
+    username: ???
+    password: ???
     port: 465
     protocol: smtps
     debug: true

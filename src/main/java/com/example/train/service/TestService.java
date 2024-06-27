@@ -37,29 +37,29 @@ public class TestService {
         countQuestions = questions.size();
     }
 
-    public String getTestPage(UserDetails currentUser, Model model,Integer timePerQuestion, CategoryNames category) {
-        Task task = getNextQuestion(category);;
+    public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType) {
+        Task task = getNextQuestion(category, questionType);
 
         if (task == null) {
             return finishTest(model, currentUser);
         }
 
-        if (timePerQuestion == null){
+        if (timePerQuestion == null) {
             timePerQuestion = 0;
         }
 
         model.addAttribute("task", task);
         model.addAttribute("timePerQuestion", timePerQuestion);
         model.addAttribute("category", category);
+        model.addAttribute("questionType", questionType);
 
         return "test";
     }
 
-    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category) {
+    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType) {
         Task currentTask = taskRepository.findById(taskId).orElse(null);
         if (currentTask == null) {
             model.addAttribute("errorMessage", "Task not found.");
-            log.error("Task not found {}", currentTask);
             return "error";
         }
         double similarity;
@@ -84,12 +84,11 @@ public class TestService {
         if (isCorrect) {
             correctCount++;
             recordTestAttempt(user.get(), true, taskRepository.findById(taskId).get());
-
         } else {
             recordTestAttempt(user.get(), false, taskRepository.findById(taskId).get());
         }
 
-        return getTestPage(currentUser, model, timePerQuestion, category);
+        return getTestPage(currentUser, model, timePerQuestion, category, questionType);
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
@@ -108,14 +107,22 @@ public class TestService {
         userRepository.save(user);
     }
 
-    private Task getNextQuestion(CategoryNames category) {
+    private Task getNextQuestion(CategoryNames category, String questionType) {
         Stream<Task> availableQuestionsStream = questions.stream()
                 .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
+
         if (category != null) {
             countQuestions = questions.stream()
-                    .filter(task -> task.getCategory().name().equals( category.name())).toList().size();
+                    .filter(task -> task.getCategory().name().equals(category.name())).toList().size();
             availableQuestionsStream = availableQuestionsStream
-                    .filter(task -> task.getCategory().name().equals( category.name()));
+                    .filter(task -> task.getCategory().name().equals(category.name()));
+        }
+
+        if (questionType != null && !questionType.isEmpty()) {
+            countQuestions = questions.stream()
+                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice()).toList().size();
+            availableQuestionsStream = availableQuestionsStream
+                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice());
         }
 
         List<Task> availableQuestions = availableQuestionsStream.toList();

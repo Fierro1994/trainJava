@@ -17,7 +17,7 @@ public class ProfileController {
     @Autowired
     private TaskService taskService;
 
-    @GetMapping("/")
+    @GetMapping("/profile")
     public String showProfile(@AuthenticationPrincipal UserDetails currentUser, Model model) {
         User user = userService.findByUsername(currentUser.getUsername());
         model.addAttribute("user", user);

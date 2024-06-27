@@ -28,15 +28,15 @@ public class TestController {
     public String testConfig(Model model) {
         return "testConfig";
     }
-
     @GetMapping("/start")
     public String startTest(@AuthenticationPrincipal UserDetails currentUser,
                             @RequestParam(required = false) Integer timePerQuestion,
                             @RequestParam(required = false) CategoryNames category,
+                            @RequestParam(required = false) String questionType,
                             Model model) {
 
         testService.initializeTest();
-        return testService.getTestPage(currentUser, model, timePerQuestion, category);
+        return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType);
     }
 
 
@@ -45,9 +45,11 @@ public class TestController {
                                @RequestParam("taskId") Long taskId,
                                @RequestParam(value = "answer", required = false) String answer,
                                @RequestParam(required = false) Integer timePerQuestion,
-                               @RequestParam(required = false) CategoryNames category, Model model) {
+                               @RequestParam(required = false) CategoryNames category,
+                               @RequestParam(required = false) String questionType,
+                               Model model) {
         try {
-            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category);
+            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category, questionType);
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка отправки ответа");
             return "error";

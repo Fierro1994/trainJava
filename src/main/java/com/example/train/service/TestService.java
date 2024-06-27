@@ -45,6 +45,10 @@ public class TestService {
             return finishTest(model);
         }
 
+        if (timePerQuestion == null){
+            timePerQuestion = 0;
+        }
+
         model.addAttribute("task", task);
         model.addAttribute("timePerQuestion", timePerQuestion);
 

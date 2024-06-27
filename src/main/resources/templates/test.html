@@ -74,10 +74,8 @@
         burger.classList.toggle('active');
     }
 
-
-        if ([[${timePerQuestion}]] !== null){
     const timePerQuestion = [[${timePerQuestion}]];
-    if (timePerQuestion && timePerQuestion > 0) {
+        if (timePerQuestion > 0 ){
     let timeLeft = timePerQuestion;
     const timerElement = document.createElement('p');
     timerElement.id = 'timer';
@@ -91,7 +89,6 @@
     timerElement.textContent = `Осталось времени: ${timeLeft--} секунд`;
     }
     }, 1000);
-    }
     }
 </script>
 </body>

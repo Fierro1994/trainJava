@@ -1,3 +1,4 @@
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
@@ -90,6 +91,16 @@ input[type="text"], textarea, select {
 }
 
 input[type="password"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+input[type="number"], textarea, select {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -519,7 +530,7 @@ ul {
     .burger {
         z-index: 100;
         position: fixed;
-        top: 0%;
+        bottom: 0%;
         right: 5.7vw;
         height: 40px;
         width: 40px;
@@ -541,7 +552,7 @@ ul {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transform: translateY(100%);
+        transform: translateY(110%);
         transition: transform 0.3s ease;
     }
     .correct-answer {

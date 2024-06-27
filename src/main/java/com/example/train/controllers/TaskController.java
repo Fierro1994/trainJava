@@ -59,8 +59,4 @@ public class TaskController {
         return "tasksList";
     }
 
-    @GetMapping("/random")
-    public Task getRandomTask() {
-        return taskService.getRandomTask();
-    }
 }

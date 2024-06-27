@@ -1,20 +1,19 @@
 package com.example.train.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@NoArgsConstructor
 @Getter
 @Setter
+@RequiredArgsConstructor
 @Table(name = "tasks")
 public class Task {
     @Id
@@ -29,13 +28,13 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private CategoryNames category;
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> options;
+    private List<String> options = new ArrayList<>();
 
     private boolean isMultipleChoice;
 
     private Integer correctOptionIndex;
     @ManyToMany(mappedBy = "tasksForReview", fetch = FetchType.LAZY)
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
 
 }

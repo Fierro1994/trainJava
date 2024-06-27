@@ -1,16 +1,14 @@
 package com.example.train.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 @Table(name = "users")
@@ -37,5 +35,5 @@ public class User {
             joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
             inverseJoinColumns = { @JoinColumn(name = "task_id", referencedColumnName = "id") }
     )
-    private Set<Task> tasksForReview;
+    private Set<Task> tasksForReview = new HashSet<>();
 }

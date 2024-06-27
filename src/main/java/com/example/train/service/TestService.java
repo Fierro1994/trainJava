@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Slf4j
 @Service
 public class TestService {
@@ -34,12 +37,7 @@ public class TestService {
     }
 
     public String getTestPage(Model model,Integer timePerQuestion, CategoryNames category) {
-        Task task;
-        if (category != null){
-            task = getNextQuestionFromCategory(category);
-        }else {
-            task = getNextQuestion();
-        }
+        Task task = getNextQuestion(category);;
 
         if (task == null) {
             return finishTest(model);
@@ -51,6 +49,7 @@ public class TestService {
 
         model.addAttribute("task", task);
         model.addAttribute("timePerQuestion", timePerQuestion);
+        model.addAttribute("category", category);
 
         return "test";
     }
@@ -84,6 +83,7 @@ public class TestService {
         if (isCorrect) {
             correctCount++;
             recordTestAttempt(user.get(), true, taskRepository.findById(taskId).get());
+
         } else {
             recordTestAttempt(user.get(), false, taskRepository.findById(taskId).get());
         }
@@ -92,44 +92,37 @@ public class TestService {
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
-
         user.setTestAttempts(user.getTestAttempts() + 1);
         if (isCorrect) {
             user.setCorrectAnswers(user.getCorrectAnswers() + 1);
         } else {
-            Set<Task> tasks = user.getTasksForReview();
-            if (tasks.isEmpty()){
-                tasks.add(task);
-                user.setTasksForReview(tasks);
+            Set<Task> tasksForReview = user.getTasksForReview();
+            if (!tasksForReview.contains(task)) {
+                tasksForReview.add(task);
+                user.setTasksForReview(tasksForReview);
             }
-            tasks.forEach(taskRev ->{
-                if (taskRev != task){
-                    user.getTasksForReview().add(task);
-                }
-            });
         }
         userRepository.save(user);
     }
 
-    private Task getNextQuestion() {
-        for (Task task : questions) {
-            if (!userAnswers.stream().anyMatch(answer -> task.getQuestion().equals(answer.get("question")))) {
-                return task;
-            }
+    private Task getNextQuestion(CategoryNames category) {
+        Stream<Task> availableQuestionsStream = questions.stream()
+                .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
+        if (category != null) {
+            availableQuestionsStream = availableQuestionsStream
+                    .filter(task -> task.getCategory().name().equals( category.name()));
+        }
+
+        List<Task> availableQuestions = availableQuestionsStream.toList();
+        System.out.println(availableQuestions);
+        if (!availableQuestions.isEmpty()) {
+            Random random = new Random();
+            int randomIndex = random.nextInt(availableQuestions.size());
+            return availableQuestions.get(randomIndex);
         }
         return null;
     }
 
-    private Task getNextQuestionFromCategory(CategoryNames category) {
-        for (Task task : questions) {
-            if (task.getCategory().name().equals(category.name())){
-                if (!userAnswers.stream().anyMatch(answer -> task.getQuestion().equals(answer.get("question")))) {
-                    return task;
-                }
-            }
-        }
-        return null;
-    }
 
     public String finishTest(Model model) {
         model.addAttribute("correctCount", correctCount);

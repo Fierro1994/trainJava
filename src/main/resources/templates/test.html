@@ -44,6 +44,7 @@
     <form th:action="@{/test/submit}" method="post">
         <input type="hidden" name="taskId" th:value="${task.id}" />
         <input type="hidden" name="timePerQuestion" th:value="${timePerQuestion}" />
+        <input type="hidden" name="category" th:value="${category}" />
         <p class="question-text" th:text="${task.question}"></p>
         <div th:if="${task.isMultipleChoice}">
             <ul>

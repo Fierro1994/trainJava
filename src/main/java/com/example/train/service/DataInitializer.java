@@ -14,8 +14,7 @@ public class DataInitializer {
 
     @Autowired
     private AuthService authService;
-    @Value("${app.adminPassword}")
-    private String adminPassword;
+
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
@@ -23,7 +22,7 @@ public class DataInitializer {
                 User admin = new User();
                 admin.setUsername("fierro1994");
                 admin.setEmail("26roma261994@mail.ru");
-                admin.setPassword(adminPassword);
+                admin.setPassword("DD52joexcmk!");
                 authService.register(admin, RoleName.ROLE_ADMIN);
                 System.out.println("Админ создан");
             }

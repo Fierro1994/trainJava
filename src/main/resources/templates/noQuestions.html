@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль</title>
+    <title>Вопросы закончились</title>
     <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<body>
 <header>
     <nav>
         <span class="burger" id="burger" onclick="toggleMenu()">
@@ -13,42 +14,32 @@
             </svg>
         </span>
         <ul id="nav-links">
-            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Профиль</a></li>
             <li><a th:href="@{/tasks/list}">Задачи</a></li>
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
-            <li><a th:href="@{/test}">Тест</a></li>
+            <li><a th:href="@{/testConfig}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:href="@{/admin/users}">Управление</a></li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
         <ul class="menu-items" id="menu-items">
-            <li><a th:href="@{/profile}">Профиль</a></li>
+            <li><a th:href="@{/}">Профиль</a></li>
             <li><a th:href="@{/tasks/list}">Задачи</a></li>
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
-            <li><a th:href="@{/test}">Тест</a></li>
+            <li><a th:href="@{/testConfig}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                 <a th:href="@{/admin/users}">Управление</a></li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
     </nav>
 </header>
-<body>
 <div class="container">
-    <h1>Профиль</h1>
-    <p>Имя пользователя: <span th:text="${user.username}"></span></p>
-    <p>E-mail: <span th:if="${user.email}" th:text="${user.email}"></span></p>
-    <p>Роль: <span th:text="${roleDisplayName}"></span></p>
-    <h2>Статистика</h2>
-    <p>Количество попыток пройти тест: <span th:text="${user.testAttempts}"></span></p>
-    <p>Количество правильных ответов: <span th:text="${user.correctAnswers}"></span></p>
-    <p>Количество неправильных ответов: <span th:text="${user.incorrectAnswers}"></span></p>
-    <p>Процент правильных ответов: <span th:text="${correctPercentage}"></span>%</p>
-    <h3>Темы для повторения</h3>
-    <ul class="results-list">
-        <li th:each="task : ${tasksForReview}">
-            <a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.question}"></a>
-        </li>
-    </ul>
+    <h1>Вопросы закончились</h1>
+    <p>На данный момент нет доступных вопросов для выбранной категории и типа.</p>
+    <div class="button-container">
+        <a class="btn" th:href="@{/tasks/add}"> Добавить задачу </a>
+        <a class="btn" th:href="@{/test}">Вернуться к настройкам теста</a>
+    </div>
 </div>
 <script>
     function toggleMenu() {

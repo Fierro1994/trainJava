@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -20,7 +19,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String email;
 
     @Column(nullable = false)
@@ -29,9 +28,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private RoleName role;
 
-    private int testAttempts;
-    private int correctAnswers;
-    private int incorrectAnswers;
+    private int testAttempts = 0;
+    private int correctAnswers = 0;
+    private int incorrectAnswers = 0;
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "tasks_for_review",

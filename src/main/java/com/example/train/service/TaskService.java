@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @Service
 public class TaskService {
@@ -70,6 +71,24 @@ public class TaskService {
         deleteTaskForReview(task);
         tasksRepos.delete(task);
         return "redirect:/tasks";
+    }
+
+    public int getAvailableQuestionsCount(CategoryNames category, String questionType) {
+        Stream<Task> taskStream = tasksRepos.findAll().stream();
+
+        if (category != null) {
+            taskStream = taskStream.filter(task -> task.getCategory().equals(category));
+        }
+
+        if (questionType != null && !questionType.isEmpty()) {
+            if (questionType.equals("multipleChoice")) {
+                taskStream = taskStream.filter(Task::isMultipleChoice);
+            } else if (questionType.equals("text")) {
+                taskStream = taskStream.filter(task -> !task.isMultipleChoice());
+            }
+        }
+
+        return (int) taskStream.count();
     }
 
     public void deleteTaskForReview(Task task) {

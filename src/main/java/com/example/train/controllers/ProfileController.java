@@ -34,6 +34,14 @@ public class ProfileController {
         User user = userService.findByUsername(currentUser.getUsername());
         model.addAttribute("user", user);
         model.addAttribute("tasksForReview", user.getTasksForReview());
+        model.addAttribute("roleDisplayName", user.getRole().getDisplayName());
+
+        double correctAnswers = user.getCorrectAnswers();
+        double totalAnswers = correctAnswers + user.getIncorrectAnswers();
+        double correctPercentage = (totalAnswers > 0) ? (correctAnswers / totalAnswers) * 100 : 0;
+        String formattedCorrectPercentage = String.format("%.2f", correctPercentage);
+
+        model.addAttribute("correctPercentage", formattedCorrectPercentage);
 
         return "profile";
     }

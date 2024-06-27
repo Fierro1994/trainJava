@@ -29,18 +29,26 @@ public class TestService {
     @Autowired
     private TaskService taskService;
 
-    public void initializeTest() {
+    public void initializeTest(Integer numberOfQuestions) {
         correctCount = 0;
         userAnswers.clear();
         taskService.resetUsedTasks();
         questions = taskService.getAllTasks();
-        countQuestions = questions.size();
+        if (numberOfQuestions == null || numberOfQuestions <= 0) {
+            countQuestions = questions.size();
+        } else {
+            countQuestions = Math.min(numberOfQuestions, questions.size());
+            Collections.shuffle(questions);
+            questions = questions.subList(0, countQuestions);
+        }
     }
 
-    public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType) {
+    public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
         Task task = getNextQuestion(category, questionType);
 
-        if (task == null) {
+        if (task == null && userAnswers.isEmpty()) {
+            return "noQuestions";
+        } else if (task == null) {
             return finishTest(model, currentUser);
         }
 
@@ -52,11 +60,38 @@ public class TestService {
         model.addAttribute("timePerQuestion", timePerQuestion);
         model.addAttribute("category", category);
         model.addAttribute("questionType", questionType);
+        model.addAttribute("currentQuestionNumber", userAnswers.size() + 1);
+        model.addAttribute("totalQuestions", numberOfQuestions != null && numberOfQuestions > 0 ? numberOfQuestions : "∞");
 
         return "test";
     }
 
-    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType) {
+    private Task getNextQuestion(CategoryNames category, String questionType) {
+        Stream<Task> availableQuestionsStream = questions.stream()
+                .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
+
+        if (category != null) {
+            availableQuestionsStream = availableQuestionsStream
+                    .filter(task -> task.getCategory().name().equals(category.name()));
+        }
+
+        if (questionType != null && !questionType.isEmpty()) {
+            availableQuestionsStream = availableQuestionsStream
+                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice());
+        }
+
+        List<Task> availableQuestions = availableQuestionsStream.toList();
+
+        if (availableQuestions.isEmpty()) {
+            return null;
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(availableQuestions.size());
+        return availableQuestions.get(randomIndex);
+    }
+
+    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
         Task currentTask = taskRepository.findById(taskId).orElse(null);
         if (currentTask == null) {
             model.addAttribute("errorMessage", "Task not found.");
@@ -81,21 +116,23 @@ public class TestService {
         answerInfo.put("taskId", currentTask.getId());
         userAnswers.add(answerInfo);
         Optional<User> user = userRepository.findByUsername(currentUser.getUsername());
-        if (isCorrect) {
-            correctCount++;
-            recordTestAttempt(user.get(), true, taskRepository.findById(taskId).get());
-        } else {
-            recordTestAttempt(user.get(), false, taskRepository.findById(taskId).get());
+        if (user.isPresent()) {
+            if (isCorrect) {
+                correctCount++;
+                recordTestAttempt(user.get(), true, currentTask);
+            } else {
+                recordTestAttempt(user.get(), false, currentTask);
+            }
         }
 
-        return getTestPage(currentUser, model, timePerQuestion, category, questionType);
+        return getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
         Set<Task> tasksForReview = user.getTasksForReview();
         if (isCorrect) {
             if (tasksForReview.contains(task)) {
-               taskService.deleteTaskForReview(task);
+                taskService.deleteTaskForReview(task);
             }
             user.setCorrectAnswers(user.getCorrectAnswers() + 1);
         } else {
@@ -103,49 +140,23 @@ public class TestService {
                 tasksForReview.add(task);
                 user.setTasksForReview(tasksForReview);
             }
+            user.setIncorrectAnswers(user.getIncorrectAnswers() + 1); // Увеличиваем количество неправильных ответов
         }
-        userRepository.save(user);
-    }
-
-    private Task getNextQuestion(CategoryNames category, String questionType) {
-        Stream<Task> availableQuestionsStream = questions.stream()
-                .filter(task -> userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))));
-
-        if (category != null) {
-            countQuestions = questions.stream()
-                    .filter(task -> task.getCategory().name().equals(category.name())).toList().size();
-            availableQuestionsStream = availableQuestionsStream
-                    .filter(task -> task.getCategory().name().equals(category.name()));
-        }
-
-        if (questionType != null && !questionType.isEmpty()) {
-            countQuestions = questions.stream()
-                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice()).toList().size();
-            availableQuestionsStream = availableQuestionsStream
-                    .filter(task -> "multipleChoice".equals(questionType) ? task.isMultipleChoice() : !task.isMultipleChoice());
-        }
-
-        List<Task> availableQuestions = availableQuestionsStream.toList();
-
-        if (!availableQuestions.isEmpty()) {
-            Random random = new Random();
-            int randomIndex = random.nextInt(availableQuestions.size());
-            return availableQuestions.get(randomIndex);
-        }
-        return null;
+        userRepository.save(user); // Сохраняем изменения в базе данных
     }
 
 
     public String finishTest(Model model, UserDetails currentUser) {
-        Optional<User> user =   userRepository.findByUsername(currentUser.getUsername());
-        user.get().setTestAttempts(user.get().getTestAttempts() + 1);
-        userRepository.save(user.get());
-        model.addAttribute("correctCount", correctCount);
-        model.addAttribute("totalQuestions", countQuestions);
-        model.addAttribute("userAnswers", userAnswers);
-        taskService.resetUsedTasks();
+        Optional<User> user = userRepository.findByUsername(currentUser.getUsername());
+        if (user.isPresent()) {
+            User userEntity = user.get();
+            userEntity.setTestAttempts(userEntity.getTestAttempts() + 1);
+            userRepository.save(userEntity);
+            model.addAttribute("correctCount", correctCount);
+            model.addAttribute("totalQuestions", countQuestions);
+            model.addAttribute("userAnswers", userAnswers);
+            taskService.resetUsedTasks();
+        }
         return "test-summary";
     }
-
-
 }

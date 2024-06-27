@@ -37,23 +37,26 @@
 </header>
 <body>
 <div class="container">
-
     <div th:if="${errorMessage}">
         <p th:text="${errorMessage}" class="error-message"></p>
+    </div>
+    <div>
+        <span th:text="'Вопрос ' + ${currentQuestionNumber} + ' из ' + (${totalQuestions} == '∞' ? '∞' : ${totalQuestions})" style="float: right;"></span>
     </div>
     <form th:action="@{/test/submit}" method="post">
         <input type="hidden" name="taskId" th:value="${task.id}" />
         <input type="hidden" name="timePerQuestion" th:value="${timePerQuestion}" />
         <input type="hidden" name="category" th:value="${category}" />
         <input type="hidden" name="questionType" th:value="${questionType}" />
+        <input type="hidden" name="numberOfQuestions" th:value="${totalQuestions}" />
         <p class="question-text" th:text="${task.question}"></p>
         <div th:if="${task.isMultipleChoice}">
             <ul>
                 <li class="list_tests_radio" th:each="option, iterStat : ${task.options}">
-                        <input class="correct_option_test" type="radio" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
-                        <label th:for="${'option' + iterStat.index}" th:text="${option}">Label</label>
-                </li>
-            </ul>
+                    <input class="correct_option_test" type="radio" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
+                    <label th:for="${'option' + iterStat.index}" th:text="${option}">Label</label>
+                    </li>
+                    </ul>
         </div>
         <div th:if="${!task.isMultipleChoice}">
             <textarea name="answer" required></textarea>
@@ -77,7 +80,7 @@
     }
 
     const timePerQuestion = [[${timePerQuestion}]];
-        if (timePerQuestion > 0 ){
+    if (timePerQuestion > 0) {
     let timeLeft = timePerQuestion;
     const timerElement = document.createElement('p');
     timerElement.id = 'timer';

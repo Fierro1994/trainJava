@@ -28,17 +28,23 @@ public class TestController {
     public String testConfig(Model model) {
         return "testConfig";
     }
+
     @GetMapping("/start")
     public String startTest(@AuthenticationPrincipal UserDetails currentUser,
                             @RequestParam(required = false) Integer timePerQuestion,
                             @RequestParam(required = false) CategoryNames category,
+                            @RequestParam(required = false) Integer numberOfQuestions,
                             @RequestParam(required = false) String questionType,
                             Model model) {
+        int availableQuestions = taskService.getAvailableQuestionsCount(category, questionType);
 
-        testService.initializeTest();
-        return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType);
+        if (numberOfQuestions == null || numberOfQuestions <= 0 || numberOfQuestions > availableQuestions) {
+            numberOfQuestions = availableQuestions;
+        }
+
+        testService.initializeTest(numberOfQuestions);
+        return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
     }
-
 
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
@@ -46,10 +52,11 @@ public class TestController {
                                @RequestParam(value = "answer", required = false) String answer,
                                @RequestParam(required = false) Integer timePerQuestion,
                                @RequestParam(required = false) CategoryNames category,
+                               @RequestParam int numberOfQuestions,
                                @RequestParam(required = false) String questionType,
                                Model model) {
         try {
-            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category, questionType);
+            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category, questionType, numberOfQuestions);
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка отправки ответа");
             return "error";

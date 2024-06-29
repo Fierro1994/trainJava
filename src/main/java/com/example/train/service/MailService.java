@@ -13,9 +13,11 @@ public class MailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
+    @Value("${myapp.hostUrl}")
+    private String hostUrl;
 
     public void sendPasswordResetMail(String toEmail, String token) {
-        String url = "http://localhost:8080/resetPassword?token=" + token;
+        String url = hostUrl + "/resetPassword?token=" + token;
         String subject = "Сброс пароля";
         String message = "Для сброса пароля перейдите по ссылке: " + url;
 

@@ -13,16 +13,20 @@ import org.springframework.context.annotation.Configuration;
 public class DataInitializer {
     @Value("${myapp.passwordDb}")
     private String password;
+    @Value("${myapp.adminName}")
+    private String adminName;
+    @Value("${myapp.adminEmail}")
+    private String adminEmail;
     @Autowired
     private AuthService authService;
 
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByUsername("fierro1994").isEmpty()) {
+            if (userRepository.findByUsername(adminName).isEmpty()) {
                 User admin = new User();
-                admin.setUsername("fierro1994");
-                admin.setEmail("26roma261994@mail.ru");
+                admin.setUsername(adminName);
+                admin.setEmail(adminEmail);
                 admin.setPassword(password);
                 authService.register(admin, RoleName.ROLE_ADMIN);
                 System.out.println("Админ создан");

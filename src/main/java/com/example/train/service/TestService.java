@@ -1,3 +1,4 @@
+
 package com.example.train.service;
 
 import com.example.train.entity.CategoryNames;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,12 +41,17 @@ public class TestService {
             countQuestions = questions.size();
         } else {
             countQuestions = Math.min(numberOfQuestions, questions.size());
-            Collections.shuffle(questions);
-            questions = questions.subList(0, countQuestions);
+            Collections.shuffle(availableQuestions);
+            availableQuestions =  availableQuestions.subList(0, countQuestions);
         }
     }
 
     public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
+        int availableQuestions = taskService.getAvailableQuestionsCount(category, questionType);
+
+        if (numberOfQuestions == null || numberOfQuestions <= 0 || numberOfQuestions > availableQuestions) {
+            numberOfQuestions = availableQuestions;
+        }
 
         Task task = getNextQuestion(category, questionType);
         if (task == null && userAnswers.isEmpty()) {
@@ -69,44 +75,29 @@ public class TestService {
     }
 
     private Task getNextQuestion(CategoryNames category, String questionType) {
-        Iterator<Task> iterator = availableQuestions.iterator();
-        while (iterator.hasNext()) {
-            Task task = iterator.next();
-            for (Map<String, Object> answer : userAnswers) {
-                if (task.getQuestion().equals(answer.get("question"))) {
-                    iterator.remove();
-                    break;
-                }
-            }
-        }
-        if (category != null) {
-            iterator = availableQuestions.iterator();
-            while (iterator.hasNext()) {
-                Task task = iterator.next();
-                if (!task.getCategory().name().equals(category.name())) {
-                    iterator.remove();
-                }
-            }
-        }
-        if (questionType != null && !questionType.isEmpty()) {
-            iterator = availableQuestions.iterator();
-            while (iterator.hasNext()) {
-                Task task = iterator.next();
-
-                boolean isMultipleChoice = "multipleChoice".equals(questionType);
-                if (task.isMultipleChoice() != isMultipleChoice) {
-                    iterator.remove();
-                }
-            }
+        if (userAnswers.size() >= countQuestions) {
+            return null;
         }
 
-        if (availableQuestions.isEmpty()) {
+        List<Task> filteredTasks = availableQuestions.stream()
+                .filter(task -> category == null || task.getCategory().equals(category))
+                .filter(task -> {
+                    if (questionType == null || questionType.isEmpty()) {
+                        return true;
+                    }
+                    boolean isMultipleChoice = "multipleChoice".equals(questionType);
+                    return task.isMultipleChoice() == isMultipleChoice;
+                })
+                .filter(task -> userAnswers.stream()
+                        .noneMatch(answer -> task.getQuestion().equals(answer.get("question"))))
+                .toList();
+
+        if (filteredTasks.isEmpty()) {
             return null;
         }
 
         Random random = new Random();
-        int randomIndex = random.nextInt(availableQuestions.size());
-        return availableQuestions.get(randomIndex);
+        return filteredTasks.get(random.nextInt(filteredTasks.size()));
     }
 
 
@@ -123,14 +114,14 @@ public class TestService {
             Set<String> correctAnswers = new HashSet<>();
             StringBuilder stringBuilder = new StringBuilder();
 
-                int count = 0;
-                for (Integer index : currentTask.getCorrectOptionIndexes()) {
-                    if (count > 0) {
-                        stringBuilder.append(",");
-                    }
-                    stringBuilder.append(currentTask.getOptions().get(index));
-                    count++;
+            int count = 0;
+            for (Integer index : currentTask.getCorrectOptionIndexes()) {
+                if (count > 0) {
+                    stringBuilder.append(",");
                 }
+                stringBuilder.append(currentTask.getOptions().get(index));
+                count++;
+            }
 
             correctAnswers.add(stringBuilder.toString());
             isCorrect = correctAnswers.contains(answer);

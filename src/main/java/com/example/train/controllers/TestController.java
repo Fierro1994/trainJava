@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 
 
 @Controller
@@ -35,15 +34,10 @@ public class TestController {
                             @RequestParam(required = false) Integer numberOfQuestions,
                             @RequestParam(required = false) String questionType,
                             Model model) {
-        int availableQuestions = taskService.getAvailableQuestionsCount(category, questionType);
-
-        if (numberOfQuestions == null || numberOfQuestions <= 0 || numberOfQuestions > availableQuestions) {
-            numberOfQuestions = availableQuestions;
-        }
-
         testService.initializeTest(numberOfQuestions);
         return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
     }
+
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
                                @RequestParam("taskId") Long taskId,

@@ -8,9 +8,7 @@
 <header>
     <nav>
         <span class="burger" id="burger" onclick="toggleMenu()">
-            <svg fill="rgb(255, 0, 0)" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" d="m194.655 128-119.1682 119.168-14.1421-14.142 105.0263-105.026-105.0263-105.0263 14.1421-14.14216z" fill="#bfbfbf" fill-rule="evenodd"/>
-            </svg>
+            <svg fill="rgb(255, 0, 0)" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m194.655 128-119.1682 119.168-14.1421-14.142 105.0263-105.026-105.0263-105.0263 14.1421-14.14216z" fill="#bfbfbf" fill-rule="evenodd"/></svg>
         </span>
         <ul id="nav-links">
             <li><a th:href="@{/profile}">Профиль</a></li>
@@ -18,7 +16,8 @@
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
             <li><a th:href="@{/test}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a></li>
+                <a th:href="@{/admin/users}">Управление</a>
+            </li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
         <ul class="menu-items" id="menu-items">
@@ -27,7 +26,8 @@
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
             <li><a th:href="@{/test}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a></li>
+                <a th:href="@{/admin/users}">Управление</a>
+            </li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
     </nav>
@@ -49,6 +49,8 @@
             <a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.question}"></a>
         </li>
     </ul>
+    <h3>Настройки безопасности</h3>
+    <a class="btn" th:href="@{/profile/changePassword}">Изменить пароль</a>
 </div>
 <script>
     function toggleMenu() {

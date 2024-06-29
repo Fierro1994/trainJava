@@ -22,3 +22,7 @@ spring:
     debug: true
 myapp:
   passwordDb: DD52joexcmk!
+  adminName: fierro1994
+  adminEmail: 26roma261994@mail.ru
+  hostUrl: http://localhost:8080
+#  hostUrl: http://89.191.225.23:8080

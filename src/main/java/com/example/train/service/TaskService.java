@@ -2,16 +2,21 @@ package com.example.train.service;
 
 import com.example.train.entity.CategoryNames;
 import com.example.train.entity.Task;
+import com.example.train.entity.TaskLog;
 import com.example.train.entity.User;
+import com.example.train.repos.TaskLogRepository;
 import com.example.train.repos.TasksRepos;
 import com.example.train.repos.UserRepository;
 import jakarta.transaction.Transactional;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +33,8 @@ public class TaskService {
     @Autowired
     private UserRepository userRepository;
     private List<Long> usedTaskIds = new ArrayList<>();
+    @Autowired
+    private TaskLogRepository taskLogRepository;
 
 
     @Transactional(rollbackOn = Exception.class)
@@ -56,6 +63,9 @@ public class TaskService {
         }
 
         tasksRepos.save(task);
+
+        logTaskAction("Добавление", task.getId());
+
         return "redirect:/tasks/" + task.getId();
     }
 
@@ -76,7 +86,21 @@ public class TaskService {
         Task task = tasksRepos.findById(id).orElse(null);
         deleteTaskForReview(task);
         tasksRepos.delete(task);
+
+        logTaskAction("Удаление", id);
+
         return "redirect:/tasks";
+    }
+
+
+    private void logTaskAction(String action, Long taskId) {
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        TaskLog taskLog = new TaskLog();
+        taskLog.setUsername(username);
+        taskLog.setAction(action);
+        taskLog.setTaskId(taskId);
+        taskLog.setTimestamp(LocalDateTime.now());
+        taskLogRepository.save(taskLog);
     }
 
     public int getAvailableQuestionsCount(CategoryNames category, String questionType) {

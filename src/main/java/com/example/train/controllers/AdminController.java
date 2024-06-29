@@ -1,9 +1,12 @@
 package com.example.train.controllers;
 
 import com.example.train.entity.RoleName;
+import com.example.train.entity.TaskLog;
 import com.example.train.entity.User;
+import com.example.train.service.LogService;
 import com.example.train.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +20,22 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private LogService taskLogService;
 
     @GetMapping("/admin/users")
     public String listUsers(Model model) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         return "admin/users";
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/admin/logs")
+    public String getTaskLogs(Model model) {
+        List<TaskLog> logs = taskLogService.getAllLogs();
+        model.addAttribute("logs", logs);
+        return "admin/taskLogs";
     }
 
     @PostMapping("/admin/users/role")

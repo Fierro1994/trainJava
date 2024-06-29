@@ -4,13 +4,14 @@
     <title>Управление пользователями</title>
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <header>
     <nav>
         <span class="burger" id="burger" onclick="toggleMenu()">
-            <svg fill="rgb(255, 0, 0)" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" d="m194.655 128-119.1682 119.168-14.1421-14.142 105.0263-105.026-105.0263-105.0263 14.1421-14.14216z" fill="#bfbfbf" fill-rule="evenodd"/>
+            <svg fill="rgb(255, 255, 255)" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                <path clip-rule="evenodd" d="M194.655 128L75.487 247.168 61.345 233.026 166.371 128 61.345 22.974 75.487 8.832 194.655 128z" fill-rule="evenodd"/>
             </svg>
         </span>
         <ul id="nav-links">
@@ -19,22 +20,23 @@
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
             <li><a th:href="@{/test}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a></li>
+                <a th:href="@{/admin/users}">Управление</a>
+            </li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
-        <ul class="menu-items" id="menu-items">
-            <li><a th:href="@{/profile}">Профиль</a></li>
-            <li><a th:href="@{/tasks/list}">Задачи</a></li>
-            <li><a th:href="@{/tasks/add}">Добавить</a></li>
-            <li><a th:href="@{/test}">Тест</a></li>
-            <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a></li>
-            <li><a th:href="@{/logout}">Выйти</a></li>
-        </ul>
+        <div class="menu-items" id="menu-items">
+            <a th:href="@{/profile}">Профиль</a>
+            <a th:href="@{/tasks/list}">Задачи</a>
+            <a th:href="@{/tasks/add}">Добавить</a>
+            <a th:href="@{/test}">Тест</a>
+            <a th:href="@{/admin/users}">Управление</a>
+            <a th:href="@{/logout}">Выйти</a>
+        </div>
     </nav>
 </header>
 <div class="container">
-    <h1 class="h1_main">Управление пользователями</h1>
+    <h1>Управление пользователями</h1>
+    <a class="btn" th:href="@{/admin/logs}">Логи</a>
     <table>
         <thead>
         <tr>
@@ -64,7 +66,6 @@
         </tbody>
     </table>
 </div>
-</body>
 <script>
     function toggleMenu() {
         var menuItems = document.getElementById('menu-items');
@@ -73,4 +74,5 @@
         burger.classList.toggle('active');
     }
 </script>
+</body>
 </html>

@@ -59,4 +59,14 @@ public class TaskController {
         return "tasksList";
     }
 
+    @GetMapping("/search")
+    public String searchTasks(@RequestParam(required = false) String search,
+                              @RequestParam(required = false) CategoryNames category,
+                              @RequestParam(required = false) String questionType,
+                              Model model) {
+        List<Task> tasks = taskService.searchTasks(search, category, questionType);
+        model.addAttribute("tasks", tasks);
+        return "searchResults";
+    }
+
 }

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -67,6 +68,27 @@ public class TaskService {
         logTaskAction("Добавление", task.getId());
 
         return "redirect:/tasks/" + task.getId();
+    }
+    public List<Task> searchTasks(String search, CategoryNames category, String questionType) {
+        Stream<Task> taskStream = tasksRepos.findAll().stream();
+
+        if (search != null && !search.isEmpty()) {
+            taskStream = taskStream.filter(task -> task.getQuestion().toLowerCase().contains(search.toLowerCase()));
+        }
+
+        if (category != null) {
+            taskStream = taskStream.filter(task -> task.getCategory().equals(category));
+        }
+
+        if (questionType != null && !questionType.isEmpty()) {
+            if (questionType.equals("multipleChoice")) {
+                taskStream = taskStream.filter(Task::isMultipleChoice);
+            } else if (questionType.equals("text")) {
+                taskStream = taskStream.filter(task -> !task.isMultipleChoice());
+            }
+        }
+
+        return taskStream.collect(Collectors.toList());
     }
 
     public String getTask(@PathVariable Long id, Model model) {

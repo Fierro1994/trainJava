@@ -26,8 +26,7 @@
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
             <li><a th:href="@{/test}">Тест</a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a>
-            </li>
+                <a th:href="@{/admin/users}">Управление</a></li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
     </nav>
@@ -40,20 +39,31 @@
     <ul class="results-list">
         <li th:each="answerInfo : ${userAnswers}" class="result-item" data-task-id="${answerInfo['taskId']}">
             <p><strong>Вопрос:</strong> <span th:text="${answerInfo['question']}"></span></p>
-            <p th:if="${answerInfo['similarity']}"><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 2, 2)} + '%'"></span></p>
+            <p><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 1, 2)} + '%'"></span></p>
             <div class="answer-container">
                 <div class="answer-block correct-answer">
                     <p><strong>Правильный ответ:</strong></p>
                     <th:block th:if="${answerInfo['task'].isMultipleChoice}">
                         <ul>
-                            <li th:each="correctAnswer : ${answerInfo['correctAnswers']}" th:text="${correctAnswer}"></li>
+                            <li th:each="option : ${answerInfo['optionsInfo']}"
+                                th:text="${option.text}"
+                                th:style="${option.isCorrect ? 'color: green;' : ''}">
+                            </li>
                         </ul>
                     </th:block>
-                    <p th:if="${!answerInfo['task'].isMultipleChoice}" th:text="${answerInfo['correctAnswer']}"></p>
+                    <p th:unless="${answerInfo['task'].isMultipleChoice}" th:utext="${answerInfo['highlightedCorrectAnswer']}"></p>
                 </div>
                 <div class="answer-block user-answer">
                     <p><strong>Твой ответ:</strong></p>
-                    <p th:text="${answerInfo['userAnswer']}"></p>
+                    <th:block th:if="${answerInfo['task'].isMultipleChoice}">
+                        <ul>
+                            <li th:each="option : ${answerInfo['optionsInfo']}"
+                                th:text="${option.text}"
+                                th:style="${option.isSelected ? (option.isCorrect ? 'color: green;' : 'color: red;') : ''}">
+                            </li>
+                        </ul>
+                    </th:block>
+                    <p th:unless="${answerInfo['task'].isMultipleChoice}" th:utext="${answerInfo['highlightedUserAnswer']}"></p>
                 </div>
             </div>
             <p><strong>Ссылка на задачу с теорией:</strong> <a th:href="@{/tasks/{id}(id=${answerInfo['taskId']})}" th:text="${answerInfo['question']}"></a></p>
@@ -63,64 +73,6 @@
     <a class="btn" th:href="@{/test}">Начать новый тест</a>
 </div>
 <script>
-    function getCorrectAnswer(correctAnswerElem) {
-        const ulElement = correctAnswerElem.querySelector('ul');
-        if (ulElement) {
-            return Array.from(ulElement.querySelectorAll('li')).map(li => li.textContent.trim()).join(',');
-        } else {
-            return correctAnswerElem.querySelector('p:nth-of-type(2)').textContent.trim();
-        }
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.result-item').forEach(function(item) {
-            const correctAnswerElem = item.querySelector('.correct-answer');
-            const userAnswerElem = item.querySelector('.user-answer');
-
-            if (correctAnswerElem && userAnswerElem) {
-                const correctAnswerTextElem = correctAnswerElem.querySelector('p:nth-of-type(2), ul');
-                const userAnswerTextElem = userAnswerElem.querySelector('p:nth-of-type(2)');
-
-
-                if (correctAnswerTextElem && userAnswerTextElem) {
-                    const correctAnswer = getCorrectAnswer(correctAnswerElem);
-                    const userAnswer = userAnswerTextElem.innerText.trim();
-
-                    function highlightDifferences(correct, user) {
-                        const correctWords = correct.split(' ');
-                        const userWords = user.split(' ');
-
-                        const maxLen = Math.max(correctWords.length, userWords.length);
-                        let highlightedCorrect = '';
-                        let highlightedUser = '';
-
-                        for (let i = 0; i < maxLen; i++) {
-                            if (correctWords[i] === userWords[i]) {
-                                highlightedCorrect += `<span class="highlight-green">${correctWords[i]}</span> `;
-                                highlightedUser += `<span class="highlight-green">${userWords[i]}</span> `;
-                            } else {
-                                if (correctWords[i]) {
-                                    highlightedCorrect += `<span class="highlight-red">${correctWords[i]}</span> `;
-                                }
-                                if (userWords[i]) {
-                                    highlightedUser += `<span class="highlight-red">${userWords[i]}</span> `;
-                                }
-                            }
-                        }
-                        return { highlightedCorrect, highlightedUser };
-                    }
-
-                    const { highlightedCorrect, highlightedUser } = highlightDifferences(correctAnswer, userAnswer);
-                    correctAnswerTextElem.innerHTML = highlightedCorrect;
-                    userAnswerTextElem.innerHTML = highlightedUser;
-                } else {
-                    console.log("Could not find answer text elements");
-                }
-            } else {
-                console.log("Could not find correctAnswerElem or userAnswerElem");
-            }
-        });
-    });
-
     function toggleMenu() {
         var menuItems = document.getElementById('menu-items');
         var burger = document.getElementById('burger');

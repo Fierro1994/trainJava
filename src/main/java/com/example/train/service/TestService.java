@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,61 +79,73 @@ public class TestService {
         }
 
         List<Task> filteredTasks = availableQuestions.stream()
-                .filter(task -> category == null || task.getCategory().equals(category))
-                .filter(task -> {
-                    if (questionType == null || questionType.isEmpty()) {
-                        return true;
-                    }
-                    boolean isMultipleChoice = "multipleChoice".equals(questionType);
-                    return task.isMultipleChoice() == isMultipleChoice;
-                })
-                .filter(task -> userAnswers.stream()
-                        .noneMatch(answer -> task.getQuestion().equals(answer.get("question"))))
+                .filter(task -> (category == null || task.getCategory().equals(category)) &&
+                        (questionType == null || questionType.isEmpty() || task.isMultipleChoice() == "multipleChoice".equals(questionType)) &&
+                        userAnswers.stream().noneMatch(answer -> task.getQuestion().equals(answer.get("question"))))
                 .toList();
 
         if (filteredTasks.isEmpty()) {
             return null;
         }
 
-        Random random = new Random();
-        return filteredTasks.get(random.nextInt(filteredTasks.size()));
+        return filteredTasks.get(new Random().nextInt(filteredTasks.size()));
     }
 
 
-    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
+    public String submitAnswer(Long taskId, String answer, Model model, UserDetails currentUser, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) throws Exception {
         Task currentTask = taskRepository.findById(taskId).orElse(null);
         if (currentTask == null) {
             model.addAttribute("errorMessage", "Task not found.");
             return "error";
         }
-        double similarity = 0.0;
         boolean isCorrect;
         Map<String, Object> answerInfo = new HashMap<>();
         if (currentTask.isMultipleChoice()) {
+            List<String> userAnswersList = Arrays.asList(answer.split(","));
             Set<String> correctAnswers = new HashSet<>();
-            StringBuilder stringBuilder = new StringBuilder();
-
-            int count = 0;
             for (Integer index : currentTask.getCorrectOptionIndexes()) {
-                if (count > 0) {
-                    stringBuilder.append(",");
+                correctAnswers.add(currentTask.getOptions().get(index));
+            }
+            Set<String> userAnswersSet = new HashSet<>(userAnswersList);
+            isCorrect = correctAnswers.equals(userAnswersSet);
+
+            int correctCount = 0;
+            for (String userAnswer : userAnswersSet) {
+                if (correctAnswers.contains(userAnswer)) {
+                    correctCount++;
                 }
-                stringBuilder.append(currentTask.getOptions().get(index));
-                count++;
+            }
+            double similarity = (double) correctCount / Math.max(correctAnswers.size(), userAnswersSet.size());
+
+            List<Map<String, Object>> optionsInfo = new ArrayList<>();
+            for (String option : currentTask.getOptions()) {
+                Map<String, Object> optionInfo = new HashMap<>();
+                optionInfo.put("text", option);
+                optionInfo.put("isCorrect", correctAnswers.contains(option));
+                optionInfo.put("isSelected", userAnswersSet.contains(option));
+                optionsInfo.add(optionInfo);
             }
 
-            correctAnswers.add(stringBuilder.toString());
-            isCorrect = correctAnswers.contains(answer);
-
-            answerInfo.put("correctAnswers", correctAnswers);
+            answerInfo.put("optionsInfo", optionsInfo);
+            answerInfo.put("isCorrect", isCorrect);
+            answerInfo.put("similarity", similarity * 100); // в процентах
         } else {
-            similarity = taskService.getSimilarityPercentage(answer, currentTask.getAnswer());
-            isCorrect = taskService.isAnswerCorrect(answer, currentTask.getAnswer());
+            double similarity;
+            try {
+                similarity = taskService.getSimilarityPercentage(answer, currentTask.getAnswer());
+                isCorrect = taskService.isAnswerCorrect(answer, currentTask.getAnswer());
+            } catch (Exception e) {
+                model.addAttribute("errorMessage", "Error calculating similarity.");
+                return "error";
+            }
+            Map<String, String> highlightedTexts = getHighlightedText(currentTask.getAnswer(), answer);
+            answerInfo.put("highlightedCorrectAnswer", highlightedTexts.get("highlightedCorrect"));
+            answerInfo.put("highlightedUserAnswer", highlightedTexts.get("highlightedUser"));
             answerInfo.put("correctAnswer", currentTask.getAnswer());
+            answerInfo.put("similarity",  similarity * 100);
         }
         answerInfo.put("task", currentTask);
         answerInfo.put("question", currentTask.getQuestion());
-        answerInfo.put("similarity", similarity);
         answerInfo.put("userAnswer", answer);
         answerInfo.put("taskId", currentTask.getId());
         userAnswers.add(answerInfo);
@@ -149,6 +160,38 @@ public class TestService {
         }
 
         return getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
+    }
+
+    public Map<String, String> getHighlightedText(String correctAnswer, String userAnswer) throws Exception {
+        StringBuilder highlightedCorrect = new StringBuilder();
+        StringBuilder highlightedUser = new StringBuilder();
+
+        int minLength = Math.min(correctAnswer.length(), userAnswer.length());
+
+        for (int i = 0; i < minLength; i++) {
+            if (correctAnswer.charAt(i) == userAnswer.charAt(i)) {
+                highlightedCorrect.append("<span style='color: green;'>").append(correctAnswer.charAt(i)).append("</span>");
+                highlightedUser.append("<span style='color: green;'>").append(userAnswer.charAt(i)).append("</span>");
+            } else {
+                highlightedCorrect.append("<span style='color: red;'>").append(correctAnswer.charAt(i)).append("</span>");
+                highlightedUser.append("<span style='color: red;'>").append(userAnswer.charAt(i)).append("</span>");
+            }
+        }
+
+        if (correctAnswer.length() > userAnswer.length()) {
+            for (int i = minLength; i < correctAnswer.length(); i++) {
+                highlightedCorrect.append("<span style='color: red;'>").append(correctAnswer.charAt(i)).append("</span>");
+            }
+        } else if (userAnswer.length() > correctAnswer.length()) {
+            for (int i = minLength; i < userAnswer.length(); i++) {
+                highlightedUser.append("<span style='color: red;'>").append(userAnswer.charAt(i)).append("</span>");
+            }
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("highlightedCorrect", highlightedCorrect.toString());
+        result.put("highlightedUser", highlightedUser.toString());
+        return result;
     }
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {

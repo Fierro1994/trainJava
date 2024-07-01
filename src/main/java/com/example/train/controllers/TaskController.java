@@ -29,6 +29,7 @@ public class TaskController {
         return "addTask";
     }
 
+
     @PostMapping("/save")
     public String save(@RequestParam String question,
                        @RequestParam(required = false) String answer,
@@ -37,7 +38,7 @@ public class TaskController {
                        @RequestParam boolean isMultipleChoice,
                        @RequestParam(required = false) List<String> options,
                        @RequestParam(required = false) List<Integer> correctOptions,
-                       Model model) throws MalformedURLException, URISyntaxException {
+                       Model model) throws Exception {
         return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
     }
 

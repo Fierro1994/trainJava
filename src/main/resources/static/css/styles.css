@@ -600,6 +600,7 @@ ul {
 }
 
 .search-bar {
+    position:relative;
     width: 100%;
     height: 100%;
 }
@@ -633,8 +634,8 @@ ul {
 
 .filters {
     position: absolute;
-    right: 12%;
-    top: 23%;
+    right: 0%;
+    top: 42px;
     z-index:-1;
     opacity: 0;
     background-color: #fff;
@@ -945,7 +946,7 @@ td button {
     }
 
     .filters {
-        right: 4%;
+        right: 0%;
         width: 40%;
     }
 

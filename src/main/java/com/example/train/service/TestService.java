@@ -30,6 +30,8 @@ public class TestService {
     private UserRepository userRepository;
     @Autowired
     private SimilarityCalculate similarityCalculate;
+    @Autowired
+    private UserService userService;
 
     public void initializeTest(Integer numberOfQuestions) {
         correctCount = 0;
@@ -174,6 +176,7 @@ public class TestService {
             if (isCorrect) {
                 correctCount++;
                 recordTestAttempt(user.get(), true, currentTask);
+                userService.addPoints(user.get(), 2); // добавляем 2 очка за правильный ответ
             } else {
                 recordTestAttempt(user.get(), false, currentTask);
             }

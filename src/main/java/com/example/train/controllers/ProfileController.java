@@ -1,5 +1,6 @@
 package com.example.train.controllers;
 
+import com.example.train.entity.User;
 import com.example.train.models.ChangePasswordForm;
 import com.example.train.models.ForgotPasswordForm;
 import com.example.train.models.ResetPasswordForm;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 
 @Controller
@@ -60,5 +63,15 @@ public class ProfileController {
     @PostMapping("/resetPassword")
     public String resetPassword(@RequestParam("token") String token, @ModelAttribute ResetPasswordForm form, Model model) {
       return authService.resetPassword(token, form, model);
+    }
+
+    @GetMapping("/top")
+    public String getTopUsers(Model model) {
+        List<User> topUsers = userService.getTopUsers(10); // получаем топ-10 пользователей
+        model.addAttribute("topUsers", topUsers);
+        if (!topUsers.isEmpty()) {
+            model.addAttribute("firstUser", topUsers.get(0));
+        }
+        return "topUsers";
     }
 }

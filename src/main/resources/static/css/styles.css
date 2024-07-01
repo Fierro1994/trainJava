@@ -882,7 +882,29 @@ td button {
     display: none;
 }
 
-
+.first-place {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.first-place .trophy {
+    width: 60px;
+    height: 60px;
+    background-color: gold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+.first-place .trophy svg {
+    width: 74%;
+    height: auto;
+}
+.first-place .username {
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
 @media (max-width: 768px) {
     header {
         position: static;

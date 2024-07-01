@@ -28,6 +28,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private RoleName role;
 
+    private int points = 0;
     private int testAttempts = 0;
     private int correctAnswers = 0;
     private int incorrectAnswers = 0;

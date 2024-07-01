@@ -4,6 +4,7 @@ import com.example.train.entity.RoleName;
 import com.example.train.entity.User;
 import com.example.train.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -43,7 +44,14 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public void addPoints(User user, int points) {
+        user.setPoints(user.getPoints() + points);
+        userRepository.save(user);
+    }
 
+    public List<User> getTopUsers(int limit) {
+        return userRepository.findTopUsers(PageRequest.of(0, limit));
+    }
 
     public void changeUserRole(Long userId, RoleName role) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));

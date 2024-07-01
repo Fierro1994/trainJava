@@ -8,22 +8,6 @@ import com.example.train.repos.TaskLogRepository;
 import com.example.train.repos.TasksRepos;
 import com.example.train.repos.UserRepository;
 import jakarta.transaction.Transactional;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.ru.RussianAnalyzer;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,28 +16,23 @@ import org.springframework.ui.Model;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class TaskService {
     private final double SIMILARITY_THRESHOLD = 0.8;
-    private final double SIMILARITY_TEST_ANSWER = 0.8;
+
 
     @Autowired
     private TasksRepos tasksRepos;
     @Autowired
     private UserRepository userRepository;
-    private List<Long> usedTaskIds = new ArrayList<>();
     @Autowired
     private TaskLogRepository taskLogRepository;
+    @Autowired
+    private SimilarityCalculate similarityCalculate;
 
-    private List<Task> questions = new ArrayList<>();
-    private List<Map<String, Object>> userAnswers = new ArrayList<>();
-    private Integer countQuestions;
-    private int correctCount = 0;
-    private List<Task> availableQuestions = new ArrayList<>();
 
     @Transactional(rollbackOn = Exception.class)
     public String saveTask(String question, String answer, String theory, CategoryNames category, boolean isMultipleChoice, List<String> options, List<Integer> correctOptionIndexes, Model model) throws Exception {
@@ -142,23 +121,6 @@ public class TaskService {
         taskLogRepository.save(taskLog);
     }
 
-    public int getAvailableQuestionsCount(CategoryNames category, String questionType) {
-        Stream<Task> taskStream = tasksRepos.findAll().stream();
-
-        if (category != null) {
-            taskStream = taskStream.filter(task -> task.getCategory().equals(category));
-        }
-
-        if (questionType != null && !questionType.isEmpty()) {
-            if (questionType.equals("multipleChoice")) {
-                taskStream = taskStream.filter(Task::isMultipleChoice);
-            } else {
-                taskStream = taskStream.filter(task -> !task.isMultipleChoice());
-            }
-        }
-
-        return (int) taskStream.count();
-    }
 
     public void deleteTaskForReview(Task task) {
         Set<User> users = task.getUsers();
@@ -172,44 +134,12 @@ public class TaskService {
         return tasksRepos.findAll();
     }
 
-    public Task getRandomTask() {
-        List<Task> tasks = tasksRepos.findAll();
-        if (usedTaskIds.size() >= tasks.size()) {
-            return null;
-        }
-
-        Task task;
-        int attempt = 0;
-        do {
-            int randomIndex = (int) (Math.random() * tasks.size());
-            task = tasks.get(randomIndex);
-            attempt++;
-        } while (usedTaskIds.contains(task.getId()) && attempt < tasks.size());
-
-        if (usedTaskIds.contains(task.getId())) {
-            return null;
-        }
-
-        usedTaskIds.add(task.getId());
-        return task;
-    }
-
-    private double getTfidfSimilarity(String text1, String text2) {
-        LevenshteinDistance levenshtein = new LevenshteinDistance();
-        int distance = levenshtein.apply(text1, text2);
-        int maxLength = Math.max(text1.length(), text2.length());
-
-        double similarity = (1.0 - (double) distance / maxLength) * 100;
-
-        return Math.max(0, Math.min(1, similarity / 100));
-    }
-
 
     public Task isSimilarTaskExists(String question) throws Exception {
         List<Task> tasks = tasksRepos.findAll();
         for (Task existingTask : tasks) {
             String existingQuestion = existingTask.getQuestion();
-            double similarity = getTfidfSimilarity(question, existingQuestion);
+            double similarity = similarityCalculate.getTSimilarity(question, existingQuestion);
             if (similarity >= SIMILARITY_THRESHOLD) {
                 return existingTask;
             }
@@ -217,17 +147,5 @@ public class TaskService {
         return null;
     }
 
-    public boolean isAnswerCorrect(String userAnswer, String correctAnswer) throws Exception {
-        double similarity = getTfidfSimilarity(userAnswer, correctAnswer);
-        return similarity >= SIMILARITY_TEST_ANSWER;
-    }
 
-    public double getSimilarityPercentage(String userAnswer, String correctAnswer) throws Exception {
-        return getTfidfSimilarity(userAnswer, correctAnswer);
-    }
-
-
-    public void resetUsedTasks() {
-        usedTaskIds.clear();
-    }
 }

@@ -13,11 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
 public class TestService {
-
+    private final double SIMILARITY_TEST_ANSWER = 0.8;
     private List<Task> questions = new ArrayList<>();
     private List<Map<String, Object>> userAnswers = new ArrayList<>();
     private Integer countQuestions;
@@ -28,25 +29,24 @@ public class TestService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TaskService taskService;
+    private SimilarityCalculate similarityCalculate;
 
     public void initializeTest(Integer numberOfQuestions) {
         correctCount = 0;
         userAnswers.clear();
-        taskService.resetUsedTasks();
-        questions = taskService.getAllTasks();
+        questions =  taskRepository.findAll();
         availableQuestions = new ArrayList<>(questions);
         if (numberOfQuestions == null || numberOfQuestions <= 0) {
             countQuestions = questions.size();
         } else {
             countQuestions = Math.min(numberOfQuestions, questions.size());
             Collections.shuffle(availableQuestions);
-            availableQuestions =  availableQuestions.subList(0, countQuestions);
+            availableQuestions = availableQuestions.subList(0, countQuestions);
         }
     }
 
     public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
-        int availableQuestions = taskService.getAvailableQuestionsCount(category, questionType);
+        int availableQuestions = getAvailableQuestionsCount(category, questionType);
 
         if (numberOfQuestions == null || numberOfQuestions <= 0 || numberOfQuestions > availableQuestions) {
             numberOfQuestions = availableQuestions;
@@ -72,6 +72,26 @@ public class TestService {
 
         return "test";
     }
+
+    public int getAvailableQuestionsCount(CategoryNames category, String questionType) {
+        Stream<Task> taskStream = taskRepository.findAll().stream();
+
+        if (category != null) {
+            taskStream = taskStream.filter(task -> task.getCategory().equals(category));
+        }
+
+        if (questionType != null && !questionType.isEmpty()) {
+            if (questionType.equals("multipleChoice")) {
+                taskStream = taskStream.filter(Task::isMultipleChoice);
+            } else {
+                taskStream = taskStream.filter(task -> !task.isMultipleChoice());
+            }
+        }
+
+        return (int) taskStream.count();
+    }
+
+
 
     private Task getNextQuestion(CategoryNames category, String questionType) {
         if (userAnswers.size() >= countQuestions) {
@@ -132,8 +152,8 @@ public class TestService {
         } else {
             double similarity;
             try {
-                similarity = taskService.getSimilarityPercentage(answer, currentTask.getAnswer());
-                isCorrect = taskService.isAnswerCorrect(answer, currentTask.getAnswer());
+                similarity = similarityCalculate.getTSimilarity(answer, currentTask.getAnswer());
+                isCorrect = isAnswerCorrect(answer, currentTask.getAnswer());
             } catch (Exception e) {
                 model.addAttribute("errorMessage", "Error calculating similarity.");
                 return "error";
@@ -142,7 +162,7 @@ public class TestService {
             answerInfo.put("highlightedCorrectAnswer", highlightedTexts.get("highlightedCorrect"));
             answerInfo.put("highlightedUserAnswer", highlightedTexts.get("highlightedUser"));
             answerInfo.put("correctAnswer", currentTask.getAnswer());
-            answerInfo.put("similarity",  similarity * 100);
+            answerInfo.put("similarity", similarity * 100);
         }
         answerInfo.put("task", currentTask);
         answerInfo.put("question", currentTask.getQuestion());
@@ -163,42 +183,73 @@ public class TestService {
     }
 
     public Map<String, String> getHighlightedText(String correctAnswer, String userAnswer) throws Exception {
+        String[] correctWords = correctAnswer.split("\\s+");
+        String[] userWords = userAnswer.split("\\s+");
+
         StringBuilder highlightedCorrect = new StringBuilder();
         StringBuilder highlightedUser = new StringBuilder();
 
-        int minLength = Math.min(correctAnswer.length(), userAnswer.length());
+        int i = 0, j = 0;
+        while (i < correctWords.length && j < userWords.length) {
+            String correctWord = correctWords[i];
+            String userWord = userWords[j];
 
-        for (int i = 0; i < minLength; i++) {
-            if (correctAnswer.charAt(i) == userAnswer.charAt(i)) {
-                highlightedCorrect.append("<span style='color: green;'>").append(correctAnswer.charAt(i)).append("</span>");
-                highlightedUser.append("<span style='color: green;'>").append(userAnswer.charAt(i)).append("</span>");
+            double similarity = similarityCalculate.getTSimilarity(correctWord, userWord);
+
+            if (similarity >= 0.8) {
+                appendGreen(highlightedCorrect, correctWord);
+                appendGreen(highlightedUser, userWord);
+                i++;
+                j++;
             } else {
-                highlightedCorrect.append("<span style='color: red;'>").append(correctAnswer.charAt(i)).append("</span>");
-                highlightedUser.append("<span style='color: red;'>").append(userAnswer.charAt(i)).append("</span>");
+                appendRed(highlightedCorrect, correctWord);
+                appendRed(highlightedUser, userWord);
+                i++;
+                j++;
             }
+
+            highlightedCorrect.append(" ");
+            highlightedUser.append(" ");
         }
 
-        if (correctAnswer.length() > userAnswer.length()) {
-            for (int i = minLength; i < correctAnswer.length(); i++) {
-                highlightedCorrect.append("<span style='color: red;'>").append(correctAnswer.charAt(i)).append("</span>");
-            }
-        } else if (userAnswer.length() > correctAnswer.length()) {
-            for (int i = minLength; i < userAnswer.length(); i++) {
-                highlightedUser.append("<span style='color: red;'>").append(userAnswer.charAt(i)).append("</span>");
-            }
+        // Добавляем оставшиеся слова, если они есть
+        while (i < correctWords.length) {
+            appendRed(highlightedCorrect, correctWords[i++]);
+            highlightedCorrect.append(" ");
         }
 
-        Map<String, String> result = new HashMap<>();
-        result.put("highlightedCorrect", highlightedCorrect.toString());
-        result.put("highlightedUser", highlightedUser.toString());
+        while (j < userWords.length) {
+            appendRed(highlightedUser, userWords[j++]);
+            highlightedUser.append(" ");
+        }
+
+        Map<String, String> result = new HashMap<>(2);
+        result.put("highlightedCorrect", highlightedCorrect.toString().trim());
+        result.put("highlightedUser", highlightedUser.toString().trim());
         return result;
     }
+
+
+    private void appendGreen(StringBuilder sb, String word) {
+        sb.append("<span style='color: green;'>").append(word).append("</span>");
+    }
+
+    private void appendRed(StringBuilder sb, String word) {
+        sb.append("<span style='color: red;'>").append(word).append("</span>");
+    }
+
+
+    public boolean isAnswerCorrect(String userAnswer, String correctAnswer) throws Exception {
+        double similarity = similarityCalculate.getTSimilarity(userAnswer, correctAnswer);
+        return similarity >= SIMILARITY_TEST_ANSWER;
+    }
+
 
     private void recordTestAttempt(User user, boolean isCorrect, Task task) {
         Set<Task> tasksForReview = user.getTasksForReview();
         if (isCorrect) {
             if (tasksForReview.contains(task)) {
-                taskService.deleteTaskForReview(task);
+                deleteTaskForReview(task);
             }
             user.setCorrectAnswers(user.getCorrectAnswers() + 1);
         } else {
@@ -211,6 +262,14 @@ public class TestService {
         userRepository.save(user);
     }
 
+    private void deleteTaskForReview(Task task) {
+        Set<User> users = task.getUsers();
+        for (User user : users) {
+            user.getTasksForReview().remove(task);
+            userRepository.save(user);
+        }
+    }
+
     public String finishTest(Model model, UserDetails currentUser) {
         Optional<User> user = userRepository.findByUsername(currentUser.getUsername());
 
@@ -221,9 +280,8 @@ public class TestService {
             model.addAttribute("correctCount", correctCount);
             model.addAttribute("totalQuestions", countQuestions);
             model.addAttribute("userAnswers", userAnswers);
-            taskService.resetUsedTasks();
-
         }
         return "test-summary";
     }
+
 }

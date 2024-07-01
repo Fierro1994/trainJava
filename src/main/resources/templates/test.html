@@ -10,10 +10,7 @@
 </head>
 <header>
     <nav>
-        <span class="burger" id="burger" onclick="toggleMenu()">
-            <svg fill="rgb(255, 0, 0)" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m194.655 128-119.1682 119.168-14.1421-14.142 105.0263-105.026-105.0263-105.0263 14.1421-14.14216z" fill="#bfbfbf" fill-rule="evenodd"/></svg>
-        </span>
-        <ul id="nav-links">
+        <ul id="desktop-nav-links">
             <li><a th:href="@{/profile}">Профиль</a></li>
             <li><a th:href="@{/tasks/list}">Задачи</a></li>
             <li><a th:href="@{/tasks/add}">Добавить</a></li>
@@ -23,15 +20,17 @@
             </li>
             <li><a th:href="@{/logout}">Выйти</a></li>
         </ul>
-        <ul class="menu-items" id="menu-items">
-            <li><a th:href="@{/profile}">Профиль</a></li>
-            <li><a th:href="@{/tasks/list}">Задачи</a></li>
-            <li><a th:href="@{/tasks/add}">Добавить</a></li>
-            <li><a th:href="@{/test}">Тест</a></li>
+        <ul class="mobile-nav-icons">
+            <li><a th:href="@{/profile}"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></a></li>
+            <li><a th:href="@{/tasks/list}"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></a></li>
+            <li><a th:href="@{/tasks/add}"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></a></li>
+            <li><a th:href="@{/test}">
+                <svg fill="#fff" class="menu-icon" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 185.667 185.667" xml:space="preserve" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5,52.888h33.334c2.762,0,5-2.239,5-5V14.555c0-2.761-2.238-5-5-5H5c-2.762,0-5,2.239-5,5v33.333 C0,50.649,2.238,52.888,5,52.888z M10,19.555h23.334v23.333H10V19.555z M38.334,132.779H5c-2.762,0-5,2.239-5,5v33.334 c0,2.761,2.238,5,5,5h33.334c2.762,0,5-2.239,5-5v-33.334C43.334,135.018,41.096,132.779,38.334,132.779z M33.334,166.112H10 v-23.334h23.334V166.112z M55.167,20.446c0-2.761,2.238-5,5-5h120.5c2.762,0,5,2.239,5,5s-2.238,5-5,5h-120.5 C57.405,25.446,55.167,23.208,55.167,20.446z M55.167,40.242c0-2.761,2.238-5,5-5h75c2.762,0,5,2.239,5,5s-2.238,5-5,5h-75 C57.405,45.242,55.167,43.003,55.167,40.242z M55.167,82.935c0-2.761,2.238-5,5-5h96.5c2.762,0,5,2.239,5,5c0,2.761-2.238,5-5,5 h-96.5C57.405,87.935,55.167,85.696,55.167,82.935z M55.167,102.731c0-2.761,2.238-5,5-5h75c2.762,0,5,2.239,5,5 c0,2.761-2.238,5-5,5h-75C57.405,107.731,55.167,105.493,55.167,102.731z M55.167,144.547c0-2.761,2.238-5,5-5h96.5 c2.762,0,5,2.239,5,5c0,2.761-2.238,5-5,5h-96.5C57.405,149.547,55.167,147.309,55.167,144.547z M185.667,164.343 c0,2.761-2.238,5-5,5h-120.5c-2.762,0-5-2.239-5-5c0-2.761,2.238-5,5-5h120.5C183.429,159.343,185.667,161.582,185.667,164.343z M52.093,56.566c-2.328-1.484-5.42-0.799-6.903,1.53l-8.329,13.071H5c-2.762,0-5,2.239-5,5V109.5c0,2.761,2.238,5,5,5h33.334 c2.762,0,5-2.239,5-5V79.617L53.623,63.47C55.106,61.141,54.422,58.05,52.093,56.566z M30.488,81.166l-9.124,14.319l-9.761-14.016 c-0.078-0.112-0.175-0.2-0.26-0.303H30.488z M10,96.666l5.455,7.834H10V96.666z M33.334,104.5h-5.856l5.856-9.19V104.5z"></path> </g></svg>
+            </a></li>
             <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a th:href="@{/admin/users}">Управление</a>
+                <a th:href="@{/admin/users}"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></a>
             </li>
-            <li><a th:href="@{/logout}">Выйти</a></li>
+            <li><a th:href="@{/logout}"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></a></li>
         </ul>
     </nav>
 </header>
@@ -72,13 +71,6 @@
     </form>
 </div>
 <script>
-    function toggleMenu() {
-        var menuItems = document.getElementById('menu-items');
-        var burger = document.getElementById('burger');
-        menuItems.classList.toggle('active');
-        burger.classList.toggle('active');
-    }
-
     const timePerQuestion = [[${timePerQuestion}]];
     if (timePerQuestion > 0) {
     let timeLeft = timePerQuestion;

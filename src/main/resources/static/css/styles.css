@@ -884,11 +884,12 @@ td button {
 
 @media (max-width: 768px) {
     header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
+        position: static;
+    }
+
+    body {
+        padding-top: 0;
+        padding-bottom: 50px;
     }
 
     .container {
@@ -917,7 +918,7 @@ td button {
         margin: 0;
         background-color: #5b81c3;
         position: fixed;
-        top: 0;
+        bottom: 0;
         left: 0;
         right: 0;
         height: 50px;
@@ -943,11 +944,7 @@ td button {
         fill: white;
     }
 
-    body {
-        padding-top: 35px;
-    }
-
-    .filters{
+    .filters {
         right: 4%;
         width: 40%;
     }
@@ -956,11 +953,7 @@ td button {
         font-size: 14px;
     }
 
-    th {
-        padding: 4px;
-        font-size: 12px;
-    }
-    td {
+    th, td {
         padding: 4px;
         font-size: 12px;
     }
@@ -979,7 +972,6 @@ td button {
         width: 100%;
     }
 
-
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -988,5 +980,4 @@ td button {
         display: block;
         margin-bottom: 5px;
     }
-
 }

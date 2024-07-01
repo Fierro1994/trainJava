@@ -932,6 +932,125 @@ td button {
     font-size: 14px;
     color: #666;
 }
+
+.user-list-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+.user-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.user-list-header h1 {
+    margin: 0;
+}
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.search-bar-users input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.search-bar-users button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #5b81c3;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.search-bar-users button:hover {
+    background-color: #7b9acd;
+}
+.user-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.user-list-table th, .user-list-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+.user-list-table th {
+    background-color: #5b81c3;
+    color: white;
+    text-align: left;
+}
+.user-list-table tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.pagination a {
+    margin: 0 5px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #5b81c3;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.pagination a.active {
+    background-color: #5b81c3;
+    color: white;
+}
+
+.profile-info {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.info-group {
+    margin-bottom: 15px;
+}
+
+.info-group label {
+    font-weight: bold;
+    color: #555;
+    display: inline-block;
+    width: 150px;
+}
+
+.info-value {
+    color: #333;
+}
+
+.role-badge {
+    background-color: #5b81c3;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+
+td a {
+    color: #5b81c3;
+    text-decoration: none;
+}
+
+td a:hover {
+    color: #7b9acd;
+}
+
+td a:visited {
+    color: #5b81c3;
+}
 @media (max-width: 768px) {
     header {
         position: static;
@@ -1006,6 +1125,11 @@ td button {
     th, td {
         padding: 4px;
         font-size: 12px;
+    }
+
+    .td_top {
+        padding: 10px;
+        font-size: 16px;
     }
 
     td form {

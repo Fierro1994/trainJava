@@ -4,7 +4,9 @@ import com.example.train.entity.RoleName;
 import com.example.train.entity.User;
 import com.example.train.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -62,5 +64,17 @@ public class UserService implements UserDetailsService {
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
+    }
+
+
+    public Page<User> searchUsers(String search, Pageable pageable) {
+        if (search == null || search.isEmpty()) {
+            return userRepository.findAll(pageable);
+        }
+        return userRepository.findByUsernameContainingIgnoreCase(search, pageable);
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 }

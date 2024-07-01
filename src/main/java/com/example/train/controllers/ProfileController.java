@@ -11,10 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -65,13 +62,5 @@ public class ProfileController {
       return authService.resetPassword(token, form, model);
     }
 
-    @GetMapping("/top")
-    public String getTopUsers(Model model) {
-        List<User> topUsers = userService.getTopUsers(10); // получаем топ-10 пользователей
-        model.addAttribute("topUsers", topUsers);
-        if (!topUsers.isEmpty()) {
-            model.addAttribute("firstUser", topUsers.get(0));
-        }
-        return "topUsers";
-    }
+
 }

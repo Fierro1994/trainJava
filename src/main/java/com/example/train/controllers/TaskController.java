@@ -9,8 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @Controller
@@ -18,8 +16,6 @@ import java.util.List;
 public class TaskController {
     @Autowired
     private TaskService taskService;
-
-
 
     @Secured({"ROLE_MODERATOR", "ROLE_ADMIN"})
     @GetMapping("/add")
@@ -29,9 +25,20 @@ public class TaskController {
         return "addTask";
     }
 
+    @Secured({"ROLE_MODERATOR", "ROLE_ADMIN"})
+    @GetMapping("/{id}/edit")
+    public String editTask(@PathVariable Long id, Model model) {
+        Task task = taskService.getTaskById(id);
+        if (task == null) {
+            return "redirect:/tasks/list";
+        }
+        model.addAttribute("task", task);
+        return "addTask"; // Используйте тот же шаблон, что и для добавления задачи
+    }
 
     @PostMapping("/save")
-    public String save(@RequestParam String question,
+    public String save(@RequestParam(required = false) Long id,
+                       @RequestParam String question,
                        @RequestParam(required = false) String answer,
                        @RequestParam String theory,
                        @RequestParam CategoryNames category,
@@ -39,7 +46,12 @@ public class TaskController {
                        @RequestParam(required = false) List<String> options,
                        @RequestParam(required = false) List<Integer> correctOptions,
                        Model model) throws Exception {
-        return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
+        System.out.println(id);
+        if (id == null) {
+            return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
+        } else {
+            return taskService.updateTask(id, question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
+        }
     }
 
     @GetMapping("/{id}")
@@ -69,5 +81,4 @@ public class TaskController {
         model.addAttribute("tasks", tasks);
         return "searchResults";
     }
-
 }

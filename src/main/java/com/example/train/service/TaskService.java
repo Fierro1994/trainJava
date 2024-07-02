@@ -147,5 +147,38 @@ public class TaskService {
         return null;
     }
 
+    public String updateTask(Long id, String question, String answer, String theory, CategoryNames category, boolean isMultipleChoice, List<String> options, List<Integer> correctOptionIndexes, Model model) throws Exception {
+        Task task = tasksRepos.findById(id).orElse(null);
+        if (task == null) {
+            model.addAttribute("errorMessage", "Задача не найдена.");
+            return "redirect:/tasks/list";
+        }
+
+        task.setQuestion(question);
+        task.setAnswer(answer);
+        task.setCategory(category);
+        task.setTheory(theory);
+        task.setMultipleChoice(isMultipleChoice);
+
+        if (options != null) {
+            task.setOptions(options);
+        }
+        if (isMultipleChoice && correctOptionIndexes != null) {
+            task.setCorrectOptionIndexes(new HashSet<>(correctOptionIndexes));
+        } else if (!isMultipleChoice && correctOptionIndexes != null && correctOptionIndexes.isEmpty()) {
+            task.setCorrectOptionIndexes(Set.of(correctOptionIndexes.get(0)));
+        }
+
+        tasksRepos.save(task);
+
+        logTaskAction("Редактирование", task.getId());
+
+        return "redirect:/tasks/" + task.getId();
+    }
+
+    public Task getTaskById(Long id) {
+        return tasksRepos.findById(id).orElse(null);
+    }
+
 
 }

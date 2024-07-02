@@ -182,12 +182,11 @@ input.inputlog {
 }
 
 .btn-red {
-    margin-top: 20px;
-    background-color: #f44336;
+    background-color: #7f241a;
 }
 
 .btn-red:hover {
-    background-color: #d32f2f;
+    opacity: 0.7;
 }
 
 .results-list {
@@ -1051,6 +1050,99 @@ td a:hover {
 td a:visited {
     color: #5b81c3;
 }
+
+
+
+.task-view {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.info-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #5b81c3;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.info-text {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.info-ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.info-ul li {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.correct-answer {
+    border-left: 4px solid green;
+}
+
+
+.ql-editor {
+    padding: 0;
+}
+.task-actions {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.task-btn {
+    flex: 1;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.task-btn-edit {
+    background-color: #6f8ab9;
+}
+
+.task-btn-delete {
+    background-color: #7f241a;
+}
+
+.task-btn:hover {
+    opacity: 0.7;
+}
+
+.task-actions form {
+    flex: 1;
+    margin: 0;
+}
+
+.task-actions form button {
+    width: 100%;
+    height: 100%;
+}
+
+
 @media (max-width: 768px) {
     header {
         position: static;
@@ -1058,17 +1150,35 @@ td a:visited {
 
     body {
         padding-top: 0;
-        padding-bottom: 50px;
+        padding-bottom: 60px;
     }
 
     .container {
+        margin-top: 8px;
         padding: 10px;
         width: 88vw;
     }
-
-    form {
-        padding: 10px;
+    .task-actions {
+        flex-direction: row;
+        height: 40px;
     }
+
+    .task-btn {
+        padding: 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .task-actions form {
+        height: 100%;
+    }
+
+    .task-actions form button {
+        height: 100%;
+    }
+
 
     form input.inputlog {
         width: 76vw;
@@ -1154,4 +1264,50 @@ td a:visited {
         display: block;
         margin-bottom: 5px;
     }
+
+    .task-view {
+        padding: 10px;
+    }
+
+    .info-section {
+        padding: 10px;
+    }
+
+    .info-text {
+        font-size: 14px;
+    }
+
+
+    /* Отключение стандартного выделения при тапе на мобильных устройствах */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Стили для всех кнопок и ссылок */
+    button,
+    .btn,
+    a {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        transition: opacity 0.1s ease;
+    }
+
+
+
+    /* Эффект при активном состоянии (нажатии) */
+    button:active,
+    .btn:active,
+    a:active {
+        opacity: 0.7;
+    }
+
+
+    p,
+    input,
+    textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
 }
+

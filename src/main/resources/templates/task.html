@@ -63,11 +63,11 @@
 
   <div class="info-section" th:if="${task.isMultipleChoice}">
     <label class="info-label" for="options">Варианты ответов:</label>
-    <ul id="options" class="info-ul">
+    <ul id="options" class="choice-list">
       <li th:each="option, iterStat : ${task.options}"
           th:text="${option}"
-          th:class="${#lists.contains(task.correctOptionIndexes, iterStat.index)} ? 'correct-answer' : ''"
-          th:style="${#lists.contains(task.correctOptionIndexes, iterStat.index)} ? 'color: green;' : ''"></li>
+          th:class="${#lists.contains(task.correctOptionIndexes, iterStat.index)} ? 'correct' : ''">
+      </li>
     </ul>
   </div>
 

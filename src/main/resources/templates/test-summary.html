@@ -38,40 +38,43 @@
 <body>
 <div class="container">
     <h1 class="h1_main">Результаты Теста</h1>
-    <p>Всего правильных ответов: <span th:text="${correctCount}"></span> из <span th:text="${totalQuestions}"></span></p>
-    <h2>Более подробно</h2>
+    <div class="test-summary">
+        <p class="test-score">Всего правильных ответов: <span th:text="${correctCount}"></span> из <span th:text="${totalQuestions}"></span></p>
+        <div class="progress-bar">
+            <div class="progress" th:style="'width:' + ${(correctCount * 100 / totalQuestions)} + '%'"></div>
+        </div>
+    </div>
     <ul class="results-list">
-        <li th:each="answerInfo : ${userAnswers}" class="result-item" data-task-id="${answerInfo['taskId']}">
-            <p><strong>Вопрос:</strong> <span th:text="${answerInfo['question']}"></span></p>
-            <p><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 1, 2)} + '%'"></span></p>
+        <li th:each="answerInfo : ${userAnswers}" class="result-item" th:data-task-id="${answerInfo['taskId']}">
+            <p class="question"><strong>Вопрос:</strong> <span th:text="${answerInfo['question']}"></span></p>
+            <p class="similarity"><strong>Совпадение с правильным ответом:</strong> <span th:text="${#numbers.formatDecimal(answerInfo['similarity'], 1, 2)} + '%'"></span></p>
             <div class="answer-container">
                 <div class="answer-block correct-answer">
-                    <p><strong>Правильный ответ:</strong></p>
+                    <strong>Правильный ответ:</strong>
                     <th:block th:if="${answerInfo['task'].isMultipleChoice}">
-                        <ul>
+                        <ul class="choice-list">
                             <li th:each="option : ${answerInfo['optionsInfo']}"
                                 th:text="${option.text}"
-                                th:style="${option.isCorrect ? 'color: green;' : ''}">
+                                th:class="${option.isCorrect ? 'correct' : ''}">
                             </li>
                         </ul>
                     </th:block>
                     <p th:unless="${answerInfo['task'].isMultipleChoice}" th:utext="${answerInfo['highlightedCorrectAnswer']}"></p>
                 </div>
                 <div class="answer-block user-answer">
-                    <p><strong>Твой ответ:</strong></p>
+                    <strong>Твой ответ:</strong>
                     <th:block th:if="${answerInfo['task'].isMultipleChoice}">
-                        <ul>
+                        <ul class="choice-list">
                             <li th:each="option : ${answerInfo['optionsInfo']}"
                                 th:text="${option.text}"
-                                th:style="${option.isSelected ? (option.isCorrect ? 'color: green;' : 'color: red;') : ''}">
+                                th:class="${option.isSelected ? (option.isCorrect ? 'correct' : 'incorrect') : ''}">
                             </li>
                         </ul>
                     </th:block>
                     <p th:unless="${answerInfo['task'].isMultipleChoice}" th:utext="${answerInfo['highlightedUserAnswer']}"></p>
                 </div>
             </div>
-            <p><strong>Ссылка на задачу с теорией:</strong> <a th:href="@{/tasks/{id}(id=${answerInfo['taskId']})}" th:text="${answerInfo['question']}"></a></p>
-            <hr/>
+            <a class="task-link" th:href="@{/tasks/{id}(id=${answerInfo['taskId']})}" th:text="'Ссылка на задачу с теорией: ' + ${answerInfo['question']}"></a>
         </li>
     </ul>
     <a class="btn" th:href="@{/test}">Начать новый тест</a>

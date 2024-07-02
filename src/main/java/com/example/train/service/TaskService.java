@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Service
 public class TaskService {
-    private final double SIMILARITY_THRESHOLD = 0.8;
+    private final double SIMILARITY_THRESHOLD = 0.6;
 
 
     @Autowired

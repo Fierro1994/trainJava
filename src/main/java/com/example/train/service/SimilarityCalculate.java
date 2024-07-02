@@ -19,9 +19,6 @@ public class SimilarityCalculate {
         Collections.sort(userWords);
         Collections.sort(correctWords);
 
-        System.out.println(userWords);
-        System.out.println(correctWords);
-
         String sortedUserAnswer = String.join(" ", userWords);
         String sortedCorrectAnswer = String.join(" ", correctWords);
 

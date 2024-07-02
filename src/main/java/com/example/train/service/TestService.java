@@ -229,7 +229,6 @@ public class TestService {
 
     public boolean isAnswerCorrect(String userAnswer, String correctAnswer) throws Exception {
         double similarity = similarityCalculate.getTSimilarity(userAnswer, correctAnswer);
-        System.out.println(similarity);
         return similarity >= SIMILARITY_TEST_ANSWER;
     }
 

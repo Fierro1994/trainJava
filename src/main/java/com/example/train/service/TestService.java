@@ -186,43 +186,29 @@ public class TestService {
     }
 
     public Map<String, String> getHighlightedText(String correctAnswer, String userAnswer) throws Exception {
-        String[] correctWords = correctAnswer.split("\\s+");
-        String[] userWords = userAnswer.split("\\s+");
+        List<String> correctWords = Arrays.asList(correctAnswer.split("\\s+"));
+        List<String> userWords = Arrays.asList(userAnswer.split("\\s+"));
 
         StringBuilder highlightedCorrect = new StringBuilder();
         StringBuilder highlightedUser = new StringBuilder();
 
-        int i = 0, j = 0;
-        while (i < correctWords.length && j < userWords.length) {
-            String correctWord = correctWords[i];
-            String userWord = userWords[j];
-
-            double similarity = similarityCalculate.getTSimilarity(correctWord, userWord);
-
-            if (similarity >= 0.8) {
-                appendGreen(highlightedCorrect, correctWord);
-                appendGreen(highlightedUser, userWord);
-                i++;
-                j++;
+        for (String word : correctWords) {
+            String lowercaseWord = word.toLowerCase();
+            if (userWords.stream().anyMatch(w -> similarityCalculate.getTSimilarity(w.toLowerCase(), lowercaseWord) >= SIMILARITY_TEST_ANSWER)) {
+                appendGreen(highlightedCorrect, word);
             } else {
-                appendRed(highlightedCorrect, correctWord);
-                appendRed(highlightedUser, userWord);
-                i++;
-                j++;
+                appendRed(highlightedCorrect, word);
             }
-
-            highlightedCorrect.append(" ");
-            highlightedUser.append(" ");
-        }
-
-        // Добавляем оставшиеся слова, если они есть
-        while (i < correctWords.length) {
-            appendRed(highlightedCorrect, correctWords[i++]);
             highlightedCorrect.append(" ");
         }
 
-        while (j < userWords.length) {
-            appendRed(highlightedUser, userWords[j++]);
+        for (String word : userWords) {
+            String lowercaseWord = word.toLowerCase();
+            if (correctWords.stream().anyMatch(w -> similarityCalculate.getTSimilarity(w.toLowerCase(), lowercaseWord) >= SIMILARITY_TEST_ANSWER)) {
+                appendGreen(highlightedUser, word);
+            } else {
+                appendRed(highlightedUser, word);
+            }
             highlightedUser.append(" ");
         }
 
@@ -231,7 +217,6 @@ public class TestService {
         result.put("highlightedUser", highlightedUser.toString().trim());
         return result;
     }
-
 
     private void appendGreen(StringBuilder sb, String word) {
         sb.append("<span style='color: green;'>").append(word).append("</span>");
@@ -244,6 +229,7 @@ public class TestService {
 
     public boolean isAnswerCorrect(String userAnswer, String correctAnswer) throws Exception {
         double similarity = similarityCalculate.getTSimilarity(userAnswer, correctAnswer);
+        System.out.println(similarity);
         return similarity >= SIMILARITY_TEST_ANSWER;
     }
 

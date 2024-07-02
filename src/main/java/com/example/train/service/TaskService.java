@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Service
 public class TaskService {
-    private final double SIMILARITY_THRESHOLD = 0.6;
+    private final double SIMILARITY_THRESHOLD = 0.9;
 
 
     @Autowired
@@ -53,6 +53,7 @@ public class TaskService {
         }
 
         Task isSimilarTaskExists = isSimilarTaskExists(question);
+
         if (isSimilarTaskExists != null) {
             model.addAttribute("errorMessage", "Задача с похожим вопросом уже есть ");
             model.addAttribute("task", isSimilarTaskExists);

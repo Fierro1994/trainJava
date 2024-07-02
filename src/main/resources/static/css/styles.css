@@ -396,6 +396,7 @@ ul {
     transition: background-color 0.3s ease;
 }
 .list_tests_radio{
+    text-align: center;
     display: flex;
     border: 1px solid #5b6297;
     height: 60px;

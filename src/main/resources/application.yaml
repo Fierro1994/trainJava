@@ -11,8 +11,6 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
-  thymeleaf:
-    cache: false
   mail:
     host: smtp.mail.ru
     username: 26roma261994@mail.ru

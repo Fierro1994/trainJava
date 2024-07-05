@@ -34,27 +34,26 @@ public class TestController {
                             @RequestParam(required = false) Integer numberOfQuestions,
                             @RequestParam(required = false) String questionType,
                             Model model) {
-        testService.initializeTest(numberOfQuestions);
+        testService.initializeTest(numberOfQuestions, category, questionType);
         return testService.getTestPage(currentUser, model, timePerQuestion, category, questionType, numberOfQuestions);
     }
 
     @PostMapping("/submit")
     public String submitAnswer(@AuthenticationPrincipal UserDetails currentUser,
                                @RequestParam("taskId") Long taskId,
-                               @RequestParam(value = "answer", required = false) String answer,
+                               @RequestParam(value = "combinedAnswer", required = false) String combinedAnswer,
                                @RequestParam(required = false) Integer timePerQuestion,
                                @RequestParam(required = false) CategoryNames category,
                                @RequestParam int numberOfQuestions,
                                @RequestParam(required = false) String questionType,
                                Model model) {
         try {
-            return testService.submitAnswer(taskId, answer, model, currentUser, timePerQuestion, category, questionType, numberOfQuestions);
+            return testService.submitAnswer(taskId, combinedAnswer, model, currentUser, timePerQuestion, category, questionType, numberOfQuestions);
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Ошибка отправки ответа");
+            model.addAttribute("errorMessage", "Ошибка отправки ответа: " + e.getMessage());
             return "error";
         }
     }
-
     @GetMapping("/finish")
     public String finishTest(@AuthenticationPrincipal UserDetails currentUser, Model model) {
         try {

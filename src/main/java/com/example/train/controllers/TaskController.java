@@ -46,7 +46,6 @@ public class TaskController {
                        @RequestParam(required = false) List<String> options,
                        @RequestParam(required = false) List<Integer> correctOptions,
                        Model model) throws Exception {
-        System.out.println(id);
         if (id == null) {
             return taskService.saveTask(question, answer, theory, category, isMultipleChoice, options, correctOptions, model);
         } else {

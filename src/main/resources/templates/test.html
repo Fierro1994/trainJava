@@ -46,17 +46,18 @@
     <div>
         <span th:text="'Вопрос ' + ${currentQuestionNumber} + ' из ' + (${totalQuestions} == '∞' ? '∞' : ${totalQuestions})" style="float: right;"></span>
     </div>
-    <form th:action="@{/test/submit}" method="post">
+    <form th:action="@{/test/submit}" method="post" id="testForm">
         <input type="hidden" name="taskId" th:value="${task.id}" />
         <input type="hidden" name="timePerQuestion" th:value="${timePerQuestion}" />
         <input type="hidden" name="category" th:value="${category}" />
         <input type="hidden" name="questionType" th:value="${questionType}" />
         <input type="hidden" name="numberOfQuestions" th:value="${totalQuestions}" />
+        <input type="hidden" name="combinedAnswer" id="combinedAnswer" />
         <p class="question-text" th:text="${task.question}"></p>
         <div th:if="${task.isMultipleChoice}">
             <ul>
                 <li class="list_tests_radio" th:each="option, iterStat : ${task.options}">
-                    <input class="correct_option_test" type="checkbox" th:id="${'option' + iterStat.index}" name="answer" th:value="${option}" />
+                    <input class="correct_option_test" type="checkbox" th:id="${'option' + iterStat.index}" th:value="${option}" />
                     <label th:for="${'option' + iterStat.index}" th:text="${option}">Label</label>
                 </li>
             </ul>
@@ -91,6 +92,19 @@
     }
     }, 1000);
     }
+
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (document.querySelector('textarea[name="answer"]')) {
+    // Если есть текстовое поле, используем его значение напрямую
+    document.getElementById('combinedAnswer').value = document.querySelector('textarea[name="answer"]').value;
+    } else {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const answers = Array.from(checkboxes).map(cb => cb.value);
+    document.getElementById('combinedAnswer').value = answers.join('||');
+    }
+    this.submit();
+    });
 </script>
 </body>
 </html>

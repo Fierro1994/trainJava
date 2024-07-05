@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -33,18 +34,25 @@ public class TestService {
     @Autowired
     private UserService userService;
 
-    public void initializeTest(Integer numberOfQuestions) {
+    public void initializeTest(Integer numberOfQuestions, CategoryNames category, String questionType) {
         correctCount = 0;
         userAnswers.clear();
-        questions =  taskRepository.findAll();
-        availableQuestions = new ArrayList<>(questions);
-        if (numberOfQuestions == null || numberOfQuestions <= 0) {
-            countQuestions = questions.size();
+        questions = taskRepository.findAll();
+
+        // Фильтруем вопросы на основе категории и типа
+        availableQuestions = questions.stream()
+                .filter(task -> (category == null || task.getCategory().equals(category))
+                        && (questionType == null || questionType.isEmpty()
+                        || task.isMultipleChoice() == "multipleChoice".equals(questionType)))
+                .collect(Collectors.toList());
+
+        if (numberOfQuestions == null || numberOfQuestions <= 0 || numberOfQuestions > availableQuestions.size()) {
+            countQuestions = availableQuestions.size();
         } else {
-            countQuestions = Math.min(numberOfQuestions, questions.size());
-            Collections.shuffle(availableQuestions);
-            availableQuestions = availableQuestions.subList(0, countQuestions);
+            countQuestions = numberOfQuestions;
         }
+
+        Collections.shuffle(availableQuestions);
     }
 
     public String getTestPage(UserDetails currentUser, Model model, Integer timePerQuestion, CategoryNames category, String questionType, Integer numberOfQuestions) {
@@ -110,7 +118,10 @@ public class TestService {
             return null;
         }
 
-        return filteredTasks.get(new Random().nextInt(filteredTasks.size()));
+        Task selectedTask = filteredTasks.get(new Random().nextInt(filteredTasks.size()));
+        availableQuestions.remove(selectedTask); // Удаляем выбранный вопрос из доступных
+
+        return selectedTask;
     }
 
 
@@ -123,13 +134,15 @@ public class TestService {
         boolean isCorrect;
         Map<String, Object> answerInfo = new HashMap<>();
         if (currentTask.isMultipleChoice()) {
-            List<String> userAnswersList = Arrays.asList(answer.split(","));
+            List<String> userAnswersList = Arrays.asList(answer.split("\\|\\|"));
+
             Set<String> correctAnswers = new HashSet<>();
             for (Integer index : currentTask.getCorrectOptionIndexes()) {
                 correctAnswers.add(currentTask.getOptions().get(index));
             }
             Set<String> userAnswersSet = new HashSet<>(userAnswersList);
             isCorrect = correctAnswers.equals(userAnswersSet);
+
 
             int correctCount = 0;
             for (String userAnswer : userAnswersSet) {
@@ -147,7 +160,6 @@ public class TestService {
                 optionInfo.put("isSelected", userAnswersSet.contains(option));
                 optionsInfo.add(optionInfo);
             }
-
             answerInfo.put("optionsInfo", optionsInfo);
             answerInfo.put("isCorrect", isCorrect);
             answerInfo.put("similarity", similarity * 100); // в процентах

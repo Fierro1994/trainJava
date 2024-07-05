@@ -360,6 +360,14 @@ ul {
     margin:0;
     padding-inline-start: 0;
 }
+.ql-code-block-container {
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: visible;
+    padding: 10px;
+    border-radius: 3px;
+}
+
 
 .btn_remove_check{
     align-items: center;

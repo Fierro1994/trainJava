@@ -488,6 +488,7 @@ ul {
     opacity: 0;
 }
 .correct-option+label {
+    font-size: 84%;
     display: inline-flex;
     align-items: center;
     user-select: none;

@@ -433,9 +433,11 @@ ul {
 }
 
 .correct_option_test+label {
+    font-size: 82%;
     display: inline-flex;
     align-items: center;
     user-select: none;
+    margin: 0px;
 }
 
 .correct_option_test+label::before {

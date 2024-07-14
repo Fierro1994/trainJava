@@ -12,6 +12,7 @@ public enum CategoryNames {
     WEB("Web"),
     ALGORITHMS("Алгоритмы"),
     PATTERNS("Паттерны"),
+    MIKRO_SERVICES("Микросервисы"),
     MULTITHREADING("Многопоточность"),
     BD("Базы данных"),
     SPRING("Spring"),

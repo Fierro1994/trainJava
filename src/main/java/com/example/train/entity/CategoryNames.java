@@ -8,7 +8,6 @@ public enum CategoryNames {
     JAVA_CORE("Java Core"),
     JAVA_COLLECTIONS("Java Collections"),
     JAVA_EE("Java EE"),
-    SERVLETS("Servlets"),
     WEB("Web"),
     ALGORITHMS("Алгоритмы"),
     PATTERNS("Паттерны"),
